@@ -1,0 +1,6 @@
+# robots.txt — feature8.com
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://feature8.com/sitemap.xml
