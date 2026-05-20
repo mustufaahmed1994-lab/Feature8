@@ -438,6 +438,17 @@ nav.nol .ham span{background:#0F0F0C}
 .mi-overlay{position:absolute;inset:0;background:rgba(15,15,12,.58);
   display:flex;align-items:flex-end;padding:16px;opacity:0;transition:opacity .3s}
 .mi-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+/* ===== COMING SOON GRID (life page) ===== */
+.coming-soon-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:48px 0 20px}
+.cs-message{padding-right:20px}
+.cs-title{font-family:var(--f-head);font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;color:var(--ink);margin-bottom:1.2rem}
+.cs-sub{font-size:0.95rem;color:var(--mut);line-height:1.7;max-width:400px}
+.cs-slots{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.cs-slot{aspect-ratio:3/4;border-radius:6px;background:var(--surf-2,rgba(255,255,255,.04));border:1px dashed var(--brd);position:relative}
+.cs-slot::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(255,255,255,.015) 4px,rgba(255,255,255,.015) 8px)}
+@media(max-width:768px){.coming-soon-grid{grid-template-columns:1fr}.cs-slots{grid-template-columns:1fr 1fr}.cs-message{padding-right:0}}
+
+
 
 /* ===== VIBE SECTION (life cards + ticker) ===== */
 .vibe{padding:100px 0 0;border-top:1px solid var(--brd);overflow:hidden}
@@ -885,6 +896,132 @@ nav.nol .ham span{background:#0F0F0C}
   .job-r{flex-direction:row;align-items:center}
 }
 </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "Feature8",
+        "url": "https://feature8.com",
+        "logo": "https://feature8.com/favicon-96x96.png",
+        "description": "Feature8 is a Karachi-based technology, information and media company.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Karachi",
+          "addressCountry": "PK"
+        },
+        "foundingDate": "2025",
+        "sameAs": []
+      },
+      {
+        "@type": "JobPosting",
+        "title": "Project Manager",
+        "description": "You guide projects from conception to completion. Own the lifecycle — plan scopes, manage budgets, track schedules, lead teams, and ensure stakeholder satisfaction.",
+        "datePosted": "2025-05-21",
+        "employmentType": "FULL_TIME",
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": "Feature8",
+          "sameAs": "https://feature8.com"
+        },
+        "jobLocation": {
+          "@type": "Place",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Karachi",
+            "addressCountry": "PK"
+          }
+        },
+        "applicantLocationRequirements": {
+          "@type": "Country",
+          "name": "Pakistan"
+        },
+        "jobLocationType": "TELECOMMUTE"
+      },
+      {
+        "@type": "JobPosting",
+        "title": "Acquisition Specialist",
+        "description": "Drive revenue by converting leads into buyers. Design funnels, execute outbound campaigns — hot/cold email, LinkedIn, calls — and optimise conversion rates.",
+        "datePosted": "2025-05-21",
+        "employmentType": "FULL_TIME",
+        "baseSalary": {
+          "@type": "MonetaryAmount",
+          "currency": "USD",
+          "value": {
+            "@type": "QuantitativeValue",
+            "minValue": 80000,
+            "maxValue": 100000,
+            "unitText": "YEAR"
+          }
+        },
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": "Feature8",
+          "sameAs": "https://feature8.com"
+        },
+        "jobLocation": {
+          "@type": "Place",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Karachi",
+            "addressCountry": "PK"
+          }
+        }
+      },
+      {
+        "@type": "JobPosting",
+        "title": "Retention Specialist",
+        "description": "Minimise customer churn and maximise brand loyalty. Identify at-risk clients, resolve service issues, and drive repeat business through personalised relationship management.",
+        "datePosted": "2025-05-21",
+        "employmentType": "FULL_TIME",
+        "baseSalary": {
+          "@type": "MonetaryAmount",
+          "currency": "USD",
+          "value": {
+            "@type": "QuantitativeValue",
+            "minValue": 80000,
+            "maxValue": 100000,
+            "unitText": "YEAR"
+          }
+        },
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": "Feature8",
+          "sameAs": "https://feature8.com"
+        },
+        "jobLocation": {
+          "@type": "Place",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Karachi",
+            "addressCountry": "PK"
+          }
+        }
+      },
+      {
+        "@type": "JobPosting",
+        "title": "DevOps Engineer",
+        "description": "Bridge development and operations. Automate everything, harden systems, and keep the deployment pipeline fast and reliable.",
+        "datePosted": "2025-05-21",
+        "employmentType": "FULL_TIME",
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": "Feature8",
+          "sameAs": "https://feature8.com"
+        },
+        "jobLocation": {
+          "@type": "Place",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Karachi",
+            "addressCountry": "PK"
+          }
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -959,7 +1096,7 @@ nav.nol .ham span{background:#0F0F0C}
 <section class="hero">
   <div class="hero-corner">Karachi, Pakistan · Est. 2025</div>
   <div class="hero-wm wm" aria-label="Feature8">Feature<span class="s8">8</span></div>
-  <p class="hero-tag" id="heroTag">Work Worth Waking Up For.</p>
+  <h1 class="hero-tag" id="heroTag">Work Worth Waking Up For.</h1>
   <div class="hero-meta">
     <div class="hero-mi">Industry<span>Tech · Info · Media</span></div>
     <div class="hero-mi">Base<span>Karachi, Pakistan</span></div>
@@ -1189,17 +1326,19 @@ nav.nol .ham span{background:#0F0F0C}
 <section class="photo-section">
   <div class="wrap">
     <span class="lbl rv">Moments</span>
-    <p class="pg-note rv">Photos from the team — replace these placeholders with real ones. That's the whole brief.</p>
-    <div class="masonry rv d1">
-      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Team Q1 2025" style="width:100%;height:280px;object-fit:cover;display:block" loading="lazy"><div class="mi-overlay"><span class="mi-label">Team · Q1 2025</span></div></div>
-      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" alt="Deep Work" style="width:100%;height:200px;object-fit:cover;display:block" loading="lazy"><div class="mi-overlay"><span class="mi-label">Deep Work</span></div></div>
-      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80" alt="The Space" style="width:100%;height:240px;object-fit:cover;display:block" loading="lazy"><div class="mi-overlay"><span class="mi-label">The Space</span></div></div>
-      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80" alt="Sprint Review" style="width:100%;height:200px;object-fit:cover;display:block" loading="lazy"><div class="mi-overlay"><span class="mi-label">Sprint Review</span></div></div>
-      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1606511490662-b2c5be7d95a1?auto=format&fit=crop&w=800&q=80" alt="After Hours Karachi" style="width:100%;height:300px;object-fit:cover;display:block" loading="lazy"><div class="mi-overlay"><span class="mi-label">After Hours · Karachi</span></div></div>
-      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&w=800&q=80" alt="Design Critique" style="width:100%;height:210px;object-fit:cover;display:block" loading="lazy"><div class="mi-overlay"><span class="mi-label">Design Critique</span></div></div>
-      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80" alt="Launch Day" style="width:100%;height:180px;object-fit:cover;display:block" loading="lazy"><div class="mi-overlay"><span class="mi-label">Launch Day</span></div></div>
-      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" alt="The View" style="width:100%;height:260px;object-fit:cover;display:block" loading="lazy"><div class="mi-overlay"><span class="mi-label">The View</span></div></div>
-      <div class="masonry-item"><img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80" alt="BD Strategy Session" style="width:100%;height:220px;object-fit:cover;display:block" loading="lazy"><div class="mi-overlay"><span class="mi-label">BD Strategy Session</span></div></div>
+    <div class="coming-soon-grid rv">
+      <div class="cs-message">
+        <p class="cs-title">Real photos.<br>Coming soon.</p>
+        <p class="cs-sub">We don't do staged team shoots. When we have moments worth sharing, they'll be here. Check back.</p>
+      </div>
+      <div class="cs-slots">
+        <div class="cs-slot"></div>
+        <div class="cs-slot"></div>
+        <div class="cs-slot"></div>
+        <div class="cs-slot"></div>
+        <div class="cs-slot"></div>
+        <div class="cs-slot"></div>
+      </div>
     </div>
   </div>
 </section>
