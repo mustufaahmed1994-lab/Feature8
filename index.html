@@ -2017,30 +2017,50 @@ filts.forEach(f=>{
 });
 
 /* ========== MODALS ========== */
-const POSITIONS=[
-  {id:'frontend',t:'Senior Frontend Developer',dept:'Tech',type:'Hybrid',sal:'PKR 220K–350K/mo',ico:'ico-code'},
-  {id:'pm',t:'Product Manager',dept:'Product',type:'Hybrid',sal:'PKR 180K–280K/mo',ico:'ico-cube'},
-  {id:'bd',t:'Business Development Lead',dept:'Sales & BD',type:'On-Site',sal:'PKR 120K–200K + comm',ico:'ico-brief'},
-  {id:'design',t:'Senior Product Designer',dept:'Design',type:'Hybrid',sal:'PKR 180K–280K/mo',ico:'ico-pen'}
-];
-let selPos=null;
-
-// Build position cards
-const hpl=document.getElementById('hmPosList');
-POSITIONS.forEach(p=>{
-  const btn=document.createElement('button');
-  btn.className='mpos-card';btn.type='button';
-  btn.innerHTML=`<div class="mpos-l"><p class="mpos-t">${p.t}</p><div class="mpos-m"><span class="mpos-dept">${p.dept}</span><span class="mpos-type">· ${p.type}</span></div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="mpos-sal">${p.sal}</span><span class="mpos-arr"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></span></div>`;
-  btn.addEventListener('click',()=>{
-    selPos=p;
-    document.getElementById('hmSelRole').textContent=p.t;
-    document.getElementById('hmStep1').classList.add('mhide');
-    document.getElementById('hmStep2').classList.remove('mhide');
+// Build hiring modal roles dynamically from careers page job cards
+function buildModalRoles() {
+  const hpl = document.getElementById('hmPosList');
+  if (!hpl) return;
+  hpl.innerHTML = '';
+  const jobs = document.querySelectorAll('.job-list .job');
+  jobs.forEach(job => {
+    const title = job.querySelector('.job-title') ? job.querySelector('.job-title').textContent.trim() : '';
+    const dept = job.querySelector('.job-dept') ? job.querySelector('.job-dept').textContent.trim() : '';
+    const tags = Array.from(job.querySelectorAll('.jtag')).map(t => t.textContent.trim());
+    const locTag = tags[0] || '';
+    const typeTag = tags[1] || '';
+    const salEl = job.querySelector('.job-sal');
+    const sal = salEl ? salEl.textContent.trim() : '';
+    const filter = job.dataset.dept || '';
+    const btn = document.createElement('button');
+    btn.className = 'mpos-card';
+    btn.type = 'button';
+    btn.dataset.pos = filter;
+    btn.innerHTML =
+      '<div class="mpos-l">' +
+        '<p class="mpos-t">' + title + '</p>' +
+        '<div class="mpos-m">' +
+          '<span>' + dept + '</span>' +
+          (typeTag ? '<span class="mpos-dot">·</span><span>' + typeTag + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div>' +
+        '<span class="mpos-sal">' + sal + '</span>' +
+        '<span class="mpos-arr"><svg class="ico" style="width:14px;height:14px;stroke-width:2"><use href="#ico-arrow-r"/></svg></span>' +
+      '</div>';
+    btn.addEventListener('click', () => {
+      selPos = filter;
+      document.getElementById('hmSelRole').textContent = title;
+      document.getElementById('hmStep1').classList.add('mhide');
+      document.getElementById('hmStep2').classList.remove('mhide');
+    });
+    hpl.appendChild(btn);
   });
-  hpl.appendChild(btn);
-});
+}
+buildModalRoles();
 
-function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden'}
+
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';if(id==='hiringModal')buildModalRoles();}
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow=''}
 
 // Hiring modal controls
