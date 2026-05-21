@@ -447,8 +447,8 @@ nav.nol .ham span{background:#0F0F0C}
 /* ===== COMING SOON GRID (life page) ===== */
 .coming-soon-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;padding:48px 0 20px}
 .cs-message{padding-right:20px}
-.cs-title{font-family:var(--f-head);font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;color:#F0F0E0!important;margin-bottom:1.2rem}
-.cs-sub{font-size:0.95rem;color:#C8C8B2!important;line-height:1.7;max-width:400px}
+.coming-soon-grid .cs-title{font-family:var(--f-head);font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;color:#F0F0E0;margin-bottom:1.2rem}
+.coming-soon-grid .cs-sub{font-size:0.95rem;color:#C8C8B2;line-height:1.7;max-width:400px}
 .cs-slots{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .cs-slot{aspect-ratio:3/4;border-radius:6px;background:var(--surf-2,rgba(255,255,255,.04));border:1px dashed var(--brd);position:relative}
 .cs-slot::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(255,255,255,.015) 4px,rgba(255,255,255,.015) 8px)}
@@ -535,8 +535,8 @@ nav.nol .ham span{background:#0F0F0C}
 .tl-body{font-size:13.5px;color:var(--mut);line-height:1.65;max-width:420px}
 
 .cta-strip{padding:100px 0;background:var(--lime)}
-.cs-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,88px);color:#0F0F0C;letter-spacing:.01em;line-height:1;margin-bottom:28px}
-.cs-sub{font-size:15px;color:rgba(0,0,0,.45);margin-bottom:32px;max-width:400px;line-height:1.65}
+.cs-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,7vw,88px);color:#0A0A08!important;letter-spacing:.01em;line-height:1;margin-bottom:28px}
+.cs-sub{font-size:15px;color:#0A0A08!important;margin-bottom:32px;max-width:400px;line-height:1.65}
 
 /* ===== 20. CAREERS ===== */
 .how{padding:100px 0;background:var(--surf);border-top:1px solid var(--brd);border-bottom:1px solid var(--brd)}
@@ -563,7 +563,7 @@ nav.nol .ham span{background:#0F0F0C}
 .filt:hover{border-color:var(--str);color:var(--str)}
 .filt.on{border-color:var(--acc);color:var(--acc);background:var(--acc-dim)}
 .job-list{display:flex;flex-direction:column;border-top:1px solid var(--brd)}
-.job{display:grid;grid-template-columns:1fr auto;align-items:center;padding:32px 0;
+.job{cursor:pointer;display:grid;grid-template-columns:1fr auto;align-items:center;padding:32px 0;
   border-bottom:1px solid var(--brd);gap:24px;text-decoration:none;transition:padding-left .25s}
 .job:hover{padding-left:20px}
 .job.hidden{display:none}
@@ -1521,7 +1521,7 @@ nav.nol .ham span{background:#0F0F0C}
       <button class="filt" data-filter="operations">Operations</button>
     </div>
     <div class="job-list rv d2" id="jobList">
-      <a href="mailto:careers@feature8.com?subject=Application: Project Manager" class="job" data-dept="operations">
+      <button class="job" data-dept="operations" data-role="Project Manager" onclick="openJobModal(this)">
         <div>
           <div class="job-dept"><svg class="ico ico-sm"><use href="#ico-target"/></svg> <p>Operations</p></div>
           <p class="job-title">Project Manager</p>
@@ -1536,8 +1536,8 @@ nav.nol .ham span{background:#0F0F0C}
           <div class="job-sal"><span>See Salary Pledge</span></div>
           <svg class="ico ico-lg"><use href="#ico-arrow-ne"/></svg>
         </div>
-      </a>
-      <a href="mailto:careers@feature8.com?subject=Application: Acquisition Specialist" class="job" data-dept="sales">
+      </button>
+      <button class="job" data-dept="sales" data-role="Acquisition Specialist" onclick="openJobModal(this)">
         <div>
           <div class="job-dept"><svg class="ico ico-sm"><use href="#ico-trending"/></svg> <p>Sales Team</p></div>
           <p class="job-title">Acquisition Specialist</p>
@@ -1552,8 +1552,8 @@ nav.nol .ham span{background:#0F0F0C}
           <div class="job-sal"><span>Monthly Range<br>PKR 80K&#8211;100K + Commission</span></div>
           <svg class="ico ico-lg"><use href="#ico-arrow-ne"/></svg>
         </div>
-      </a>
-      <a href="mailto:careers@feature8.com?subject=Application: Retention Specialist" class="job" data-dept="sales">
+      </button>
+      <button class="job" data-dept="sales" data-role="Retention Specialist" onclick="openJobModal(this)">
         <div>
           <div class="job-dept"><svg class="ico ico-sm"><use href="#ico-shield"/></svg> <p>Sales Team</p></div>
           <p class="job-title">Retention Specialist</p>
@@ -1568,8 +1568,8 @@ nav.nol .ham span{background:#0F0F0C}
           <div class="job-sal"><span>Monthly Range<br>PKR 80K&#8211;100K + Commission</span></div>
           <svg class="ico ico-lg"><use href="#ico-arrow-ne"/></svg>
         </div>
-      </a>
-      <a href="mailto:careers@feature8.com?subject=Application: DevOps Engineer" class="job" data-dept="tech">
+      </button>
+      <button class="job" data-dept="tech" data-role="DevOps Engineer" onclick="openJobModal(this)">
         <div>
           <div class="job-dept"><svg class="ico ico-sm"><use href="#ico-zap"/></svg> <p>Tech</p></div>
           <p class="job-title">DevOps Engineer</p>
@@ -1584,7 +1584,7 @@ nav.nol .ham span{background:#0F0F0C}
           <div class="job-sal"><span>See Salary Pledge</span></div>
           <svg class="ico ico-lg"><use href="#ico-arrow-ne"/></svg>
         </div>
-      </a>
+      </button>
     <div class="no-results" id="noResults"><p>No roles in this department right now.</p></div>
     <div class="honest-note rv"><p>Salary ranges shown are real and sourced from our <a href="#salary-pledge" data-page="salary-pledge">Salary Pledge</a>. <strong>We don't negotiate against you.</strong> All applications go to careers@feature8.com. You will get a response.</p></div>
   </div>
@@ -2216,15 +2216,7 @@ document.getElementById('hmBackBtn').addEventListener('click',()=>{
   document.getElementById('hmStep1').classList.remove('mhide');
   selPos=null;
 });
-document.getElementById('hmForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const d=new FormData(e.target);
-  const subj=encodeURIComponent(`Application: ${selPos?selPos.t:'Open Role'}`);
-  const body=encodeURIComponent(`Name: ${d.get('name')}\nEmail: ${d.get('email')}\nPhone: ${d.get('phone')||'—'}\nLinkedIn: ${d.get('link')||'—'}\nRole: ${selPos?selPos.t:'N/A'}\n\n${d.get('note')}`);
-  try{window.open(`mailto:careers@feature8.com?subject=${subj}&body=${body}`)}catch(e){}
-  document.getElementById('hmStep2').classList.add('mhide');
-  document.getElementById('hmStep3').classList.remove('mhide');
-});
+;
 document.getElementById('hmSuccessClose').addEventListener('click',()=>{
   closeModal('hiringModal');
   setTimeout(()=>{document.getElementById('hmStep3').classList.add('mhide');document.getElementById('hmStep1').classList.remove('mhide')},320);
@@ -2233,15 +2225,7 @@ document.getElementById('hmSuccessClose').addEventListener('click',()=>{
 // General application modal controls
 document.getElementById('gmClose').addEventListener('click',()=>closeModal('generalModal'));
 document.getElementById('generalModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal('generalModal')});
-document.getElementById('gmForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const d=new FormData(e.target);
-  const subj=encodeURIComponent('General Application — Feature8');
-  const body=encodeURIComponent(`Name: ${d.get('name')}\nEmail: ${d.get('email')}\nPhone: ${d.get('phone')||'—'}\nLinkedIn: ${d.get('link')||'—'}\nArea: ${d.get('area')}\nGreat at: ${d.get('skill')}\n\n${d.get('message')}`);
-  try{window.open(`mailto:careers@feature8.com?subject=${subj}&body=${body}`)}catch(e){}
-  document.getElementById('gmFormWrap').classList.add('mhide');
-  document.getElementById('gmSuccess').classList.remove('mhide');
-});
+;
 document.getElementById('gmSuccessClose').addEventListener('click',()=>{
   closeModal('generalModal');
   setTimeout(()=>{document.getElementById('gmSuccess').classList.add('mhide');document.getElementById('gmFormWrap').classList.remove('mhide')},320);
@@ -2391,6 +2375,20 @@ if(initPage==='home'){
     handleForm('hmForm');
     handleForm('gmForm');
   })();
+
+  function openJobModal(btn) {
+    const role = btn.getAttribute('data-role');
+    openModal('hiringModal');
+    setTimeout(function() {
+      const modalCards = document.querySelectorAll('#hmPosList .mpos-card');
+      modalCards.forEach(function(card) {
+        const titleEl = card.querySelector('.mpos-t');
+        if (titleEl && titleEl.textContent.trim() === role) {
+          card.click();
+        }
+      });
+    }, 50);
+  }
 </script>
 </body>
 </html>
