@@ -219,11 +219,11 @@ footer{background:var(--surf);border-top:1px solid var(--brd);padding:72px 80px 
 
 /* ===== 15. SHARED PAGE HEADER ===== */
 /* FIX: line-height:1 on all display headings to prevent overlap */
-.ph{min-height:70vh;display:flex;flex-direction:column;justify-content:flex-end;padding:100px 80px 80px}
+.ph{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:100px 80px 80px;box-sizing:border-box}
 .ph-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.22em;
   text-transform:uppercase;color:var(--acc);margin-bottom:28px;display:block;
   opacity:0;animation:fIn .6s ease .4s forwards}
-.ph-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,12.5vw,172px);
+.ph-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,9vw,120px);
   line-height:1;color:var(--str);letter-spacing:.01em;
   clip-path:inset(0 0 100% 0);animation:slideUp .95s cubic-bezier(.76,0,.24,1) .2s forwards}
 .ph-sub{font-size:clamp(16px,1.9vw,21px);color:var(--txt);max-width:560px;
@@ -751,7 +751,7 @@ nav.nol .ham span{background:#0F0F0C}
 .srv-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.22em;
   text-transform:uppercase;color:var(--acc);display:block;margin-bottom:24px;
   opacity:0;animation:fIn .6s ease .4s forwards}
-.srv-hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(64px,13vw,176px);
+.srv-hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,9vw,120px);
   line-height:1;color:var(--str);letter-spacing:.01em;margin-bottom:40px;
   clip-path:inset(0 0 100% 0);animation:slideUp .95s cubic-bezier(.76,0,.24,1) .2s forwards}
 .srv-hero-sub{font-size:clamp(16px,1.9vw,21px);color:var(--txt);max-width:600px;
@@ -1985,7 +1985,7 @@ nav.nol .ham span{background:#0F0F0C}
     <div class="ft-grid">
       <div>
         <div class="ft-wm wm">Feature<span class="s8">8</span></div>
-        <p class="ft-tag">Karachi, Pakistan. Technology, Information and Media.<br>Building the place talented people don't want to leave.</p>
+        <p class="ft-tag">Building the place talented people don't want to leave.<br>Technology, Information and Media.<br>Karachi, Pakistan.</p>
       </div>
       <div class="ft-col">
         <span class="ft-ch">Pages</span>
