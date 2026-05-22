@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 const salaryData = [
   { category: 'Engineering and Technology', rows: [
@@ -37,18 +37,18 @@ const salaryData = [
 ]
 
 const policies = [
-  { title: 'Annual Reviews', desc: 'Every salary is reviewed once per year in January. The benchmark is Pakistan CPI, not internal peer comparisons. If inflation outpaces your raise, that's a failure on our side.' },
-  { title: 'Negotiation', desc: "We negotiate with you, not against you. If you're asking above range, we'll tell you honestly whether that's possible rather than string you along. No games." },
-  { title: 'Off-Cycle Increases', desc: "If your scope changes significantly mid-year, your salary follows. We don't wait for January to acknowledge you're doing a bigger job." },
-  { title: 'Benefits on Top', desc: "Medical, learning budget, and tools are on top of these ranges. We don't fold those into 'total compensation' to make salaries look bigger than they are." },
+  { title: 'Annual Reviews', desc: 'Every salary is reviewed once per year in January. The benchmark is Pakistan CPI, not internal peer comparisons. If inflation outpaces your raise, that is a failure on our side.' },
+  { title: 'Negotiation', desc: 'We negotiate with you, not against you. If you are asking above range, we will tell you honestly whether that is possible rather than string you along. No games.' },
+  { title: 'Off-Cycle Increases', desc: 'If your scope changes significantly mid-year, your salary follows. We do not wait for January to acknowledge you are doing a bigger job.' },
+  { title: 'Benefits on Top', desc: 'Medical, learning budget, and tools are on top of these ranges. We do not fold those into total compensation to make salaries look bigger than they are.' },
 ]
 
 const faqs = [
-  { q: "What if I'm earning more than your range?", a: "We'll tell you in the first call. We won't try to talk you down or sell you on 'total compensation.' If the range doesn't work, it doesn't work." },
-  { q: 'Are ranges adjusted for experience?', a: "Within the range, yes. The level is set by the role requirements, not by what you were making before." },
-  { q: 'Can ranges change?', a: "Yes, upward. We review annually. If market rates move, we move with them. Downward changes don't happen without a public announcement." },
-  { q: 'What about promotions?', a: "If you get promoted or your scope changes materially, your salary changes with it. Off-cycle adjustments happen when warranted." },
-  { q: 'What if the ranges feel low?', a: "Tell us. Email careers@feature8.com with data and we'll look at it seriously. We review against the market every six months." },
+  { q: 'What if I am earning more than your range?', a: 'We will tell you in the first call. We will not try to talk you down or sell you on total compensation. If the range does not work, it does not work.' },
+  { q: 'Are ranges adjusted for experience?', a: 'Within the range, yes. The level is set by the role requirements, not by what you were making before.' },
+  { q: 'Can ranges change?', a: 'Yes, upward. We review annually. If market rates move, we move with them. Downward changes do not happen without a public announcement.' },
+  { q: 'What about promotions?', a: 'If you get promoted or your scope changes materially, your salary changes with it. Off-cycle adjustments happen when warranted.' },
+  { q: 'What if the ranges feel low?', a: 'Tell us. Email careers@feature8.com with data and we will look at it seriously. We review against the market every six months.' },
 ]
 
 export default function SalaryPledge() {
@@ -60,7 +60,7 @@ export default function SalaryPledge() {
           <div className="section-label">THE FEATURE8 SALARY PLEDGE</div>
           <h2 className="section-title text-[clamp(3rem,7vw,7rem)]">We Publish<br />What We Pay.</h2>
           <p className="text-cream/50 mt-6 max-w-2xl text-lg leading-relaxed">
-            Salary opacity is how companies suppress wages and convince people to accept less than they're worth. We're not playing that game. Every range on this page is real, reviewed annually, and tied to the role, not to how well you negotiate.
+            Salary opacity is how companies suppress wages and convince people to accept less than they are worth. Every range on this page is real, reviewed annually, and tied to the role, not to how well you negotiate.
           </p>
           <p className="text-cream/30 text-sm mt-4">Last updated: May 2025</p>
         </div>
@@ -68,7 +68,7 @@ export default function SalaryPledge() {
         <div className="overflow-x-auto">
           <div className="mb-6">
             <h3 className="font-display font-extrabold text-2xl text-cream">Salary Ranges · PKR Per Month · Gross</h3>
-            <p className="text-cream/40 text-sm mt-2">All Roles. All Levels. Published. Ranges reviewed each January against actual inflation data.</p>
+            <p className="text-cream/40 text-sm mt-2">All Roles. All Levels. Published.</p>
           </div>
           <table className="w-full">
             <thead>
@@ -82,14 +82,14 @@ export default function SalaryPledge() {
             </thead>
             <tbody>
               {salaryData.map(cat => (
-                <>
-                  <tr key={cat.category}>
+                <React.Fragment key={cat.category}>
+                  <tr>
                     <td colSpan={5} className="pt-8 pb-3">
                       <span className="text-[9px] tracking-[0.2em] uppercase text-lime-400/70 font-semibold">{cat.category}</span>
                     </td>
                   </tr>
                   {cat.rows.map((row, i) => (
-                    <tr key={i} className={`salary-row ${row.highlight ? 'bg-lime-400/3' : ''}`}>
+                    <tr key={i} className="salary-row">
                       <td className="text-cream text-sm font-medium">{row.role}</td>
                       <td className="text-cream/40 text-xs">{row.dept}</td>
                       <td className="text-cream/60 text-sm">{row.level}</td>
@@ -97,7 +97,7 @@ export default function SalaryPledge() {
                       <td className={`text-xs ${row.highlight ? 'text-lime-400' : 'text-cream/30'}`}>{row.notes}</td>
                     </tr>
                   ))}
-                </>
+                </React.Fragment>
               ))}
             </tbody>
           </table>
@@ -114,16 +114,12 @@ export default function SalaryPledge() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div>
-            <h3 className="font-display font-extrabold text-2xl text-cream mb-2">Our Philosophy</h3>
-            <h4 className="text-cream/40 text-sm mb-6">Why We're Doing This</h4>
+            <h3 className="font-display font-extrabold text-2xl text-cream mb-6">Our Philosophy</h3>
             <p className="text-cream/55 text-sm leading-relaxed mb-4">
-              Salary transparency makes companies better. It forces consistency. You cannot pay one person at the bottom of the range and another at the top for the same work and pretend there's no bias once the numbers are public.
-            </p>
-            <p className="text-cream/55 text-sm leading-relaxed mb-4">
-              When candidates know the range before they apply, the conversation becomes about the role. Not about game theory. Not about who blinks first.
+              Salary transparency makes companies better. It forces consistency. You cannot pay one person at the bottom of the range and another at the top for the same work and pretend there is no bias once the numbers are public.
             </p>
             <p className="text-cream/55 text-sm leading-relaxed">
-              We know this is unusual in Karachi. We're fine with that. If this document causes someone to go ask for a raise they deserved, that's a good outcome, even if they never apply to us.
+              We know this is unusual in Karachi. We are fine with that. If this document causes someone to go ask for a raise they deserved, that is a good outcome, even if they never apply to us.
             </p>
           </div>
           <div>
@@ -152,9 +148,8 @@ export default function SalaryPledge() {
         </div>
 
         <div className="text-center">
-          <div className="section-label flex justify-center mb-4">Ready?</div>
           <h3 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] text-cream mb-4">Now You Know What We Pay.</h3>
-          <p className="text-cream/50 mb-8">Four roles open. The ranges are on this page. What's left is applying.</p>
+          <p className="text-cream/50 mb-8">Four roles open. The ranges are on this page. What is left is applying.</p>
           <a href="#careers" className="btn-primary">See Open Roles →</a>
         </div>
       </div>
