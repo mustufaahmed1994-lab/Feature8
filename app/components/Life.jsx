@@ -1,15 +1,15 @@
 'use client'
 
 const timeline = [
-  { time: '6:00 PM', title: 'Log On — Async Updates', desc: 'Slack standup kicks off the shift. What you finished last night, what's on deck, what's blocking you. Two minutes. Written. No meeting required.' },
-  { time: '6:30 – 10:00 PM', title: 'Prime Work Block', desc: 'US East Coast and UK afternoon overlap. This is the golden window — maximum async bandwidth with international teammates. Deep work. Real outputs.' },
-  { time: '10:00 PM', title: 'Dinner and Breathing', desc: "An hour. Whole. We're not going to send a message at 10:15 and expect a reply. The break is protected, not optional." },
-  { time: '11:00 PM – 1:30 AM', title: 'International Sync Hours', desc: 'US West Coast morning, Canada overlap. This is where live calls, sprint reviews, design critiques, and cross-timezone standups happen. Calendars are visible to everyone.' },
-  { time: '1:30 – 3:00 AM', title: 'Focused Close-Out', desc: 'The city is quiet. The calls are done. This is wrap-up time: PRs merged, tickets updated, async notes left for the day team. One final push before the handoff.' },
-  { time: '3:00 AM', title: 'Log Off', desc: "Shift ends. Nobody is sending messages after this. No exceptions. The next shift picks up where you left off." },
+  { time: "6:00 PM", title: "Log On — Async Updates", desc: "Slack standup kicks off the shift. What you finished last night, what is on deck, what is blocking you. Two minutes. Written. No meeting required." },
+  { time: "6:30 – 10:00 PM", title: "Prime Work Block", desc: "US East Coast and UK afternoon overlap. This is the golden window. Deep work. Real outputs." },
+  { time: "10:00 PM", title: "Dinner and Breathing", desc: "An hour. Whole. We are not going to send a message at 10:15 and expect a reply. The break is protected, not optional." },
+  { time: "11:00 PM – 1:30 AM", title: "International Sync Hours", desc: "US West Coast morning, Canada overlap. Live calls, sprint reviews, design critiques, and cross-timezone standups. Calendars are visible to everyone." },
+  { time: "1:30 – 3:00 AM", title: "Focused Close-Out", desc: "The city is quiet. The calls are done. Wrap-up time: PRs merged, tickets updated, async notes left for the day team." },
+  { time: "3:00 AM", title: "Log Off", desc: "Shift ends. Nobody is sending messages after this. No exceptions." },
 ]
 
-const tickerItems = ['Ship It', 'Game On', 'Level Up', 'Deep Work', 'Build Together', 'Own It', 'Late Night Launches', 'No BS', 'Stay Hungry', 'Real Ownership', 'Creative Recharge', 'Make It Count', 'International Stage', 'Vibe Matters', 'Career Growth', '6PM to 6AM']
+const tickerItems = ["Ship It", "Game On", "Level Up", "Deep Work", "Build Together", "Own It", "Late Night Launches", "No BS", "Stay Hungry", "Real Ownership", "Creative Recharge", "Make It Count", "International Stage", "Vibe Matters", "Career Growth", "6PM to 6AM"]
 
 export default function Life() {
   return (
@@ -18,9 +18,9 @@ export default function Life() {
         <div className="max-w-7xl mx-auto">
           <div className="reveal mb-16">
             <div className="section-label">LIFE AT FEATURE8</div>
-            <h2 className="section-title text-[clamp(3rem,7vw,7rem)]">Show.<br />Don't Tell.</h2>
+            <h2 className="section-title text-[clamp(3rem,7vw,7rem)]">Show.<br />Don&apos;t Tell.</h2>
             <p className="text-cream/50 mt-6 max-w-xl text-lg leading-relaxed">
-              No stock photos. No team outing captions. Real moments from the people who work here. We'll keep adding to this page as we grow.
+              No stock photos. No team outing captions. Real moments from the people who work here.
             </p>
           </div>
 
@@ -34,7 +34,7 @@ export default function Life() {
               ))}
             </div>
             <p className="text-cream/25 text-sm mt-4">
-              We don't do staged team shoots. When we have moments worth sharing, they'll be here. Check back.
+              We don&apos;t do staged team shoots. When we have moments worth sharing, they&apos;ll be here.
             </p>
           </div>
         </div>
