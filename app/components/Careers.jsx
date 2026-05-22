@@ -2,24 +2,24 @@
 import { useState } from 'react'
 
 const steps = [
-  { num:'01', title:'Apply', desc:'Send your CV and a short note about why this role. No cover letter template. Just tell us what you care about.', time:'Day 1 to 3' },
-  { num:'02', title:'Intro Call', desc:"30 minutes with a team lead. We'll walk you through the role. You ask the questions you actually need answered.", time:'30 mins · Day 5 to 7' },
-  { num:'03', title:'Work Sample', desc:'A short, relevant task. Not a free project. 2 to 3 hours. We review seriously and give feedback regardless of outcome.', time:'2 to 3 hrs · Day 10 to 14' },
-  { num:'04', title:'Decision', desc:'A final conversation. Offer or honest feedback. Timeline from application to offer: 2 to 3 weeks maximum.', time:'Day 14 to 21' },
+  { num:"01", title:"Apply", desc:"Send your CV and a short note about why this role. No cover letter template. Just tell us what you care about.", time:"Day 1 to 3" },
+  { num:"02", title:"Intro Call", desc:"30 minutes with a team lead. We will walk you through the role. You ask the questions you actually need answered.", time:"30 mins · Day 5 to 7" },
+  { num:"03", title:"Work Sample", desc:"A short, relevant task. Not a free project. 2 to 3 hours. We review seriously and give feedback regardless of outcome.", time:"2 to 3 hrs · Day 10 to 14" },
+  { num:"04", title:"Decision", desc:"A final conversation. Offer or honest feedback. Timeline from application to offer: 2 to 3 weeks maximum.", time:"Day 14 to 21" },
 ]
 
 const roles = [
-  { dept: 'Operations', deptSlug: 'operations', title: 'Project Manager', location: 'Karachi', type: 'On-Site', employment: 'Full-Time', desc: 'You guide projects from conception to completion. Own the lifecycle — scopes, budgets, schedules, teams, and stakeholders. If it ships on time and to spec, that's on you.', salary: 'See Salary Pledge' },
-  { dept: 'Sales Team', deptSlug: 'sales', title: 'Acquisition Specialist', location: 'Karachi', type: 'On-Site', employment: 'Full-Time', desc: 'You convert leads into buyers. Design funnels, run outbound campaigns — hot/cold email, LinkedIn, calls — and optimize conversion. Revenue is the metric.', salary: 'PKR 80K–100K + Commission' },
-  { dept: 'Sales Team', deptSlug: 'sales', title: 'Retention Specialist', location: 'Karachi', type: 'On-Site', employment: 'Full-Time', desc: 'Minimize churn. Maximize loyalty. Identify at-risk clients, resolve issues, drive renewals and upsells through relationships. Retention is the compounding variable.', salary: 'PKR 80K–100K + Commission' },
-  { dept: 'Tech', deptSlug: 'tech', title: 'DevOps Engineer', location: 'Karachi', type: 'On-Site', employment: 'Full-Time', desc: 'Bridge development and operations. Automate everything, harden systems, accelerate delivery. CI/CD, infrastructure, monitoring — if it keeps things running, it's yours.', salary: 'See Salary Pledge' },
+  { dept: "Operations", deptSlug: "operations", title: "Project Manager", location: "Karachi", type: "On-Site", employment: "Full-Time", desc: "You guide projects from conception to completion. Own the lifecycle. If it ships on time and to spec, that is on you.", salary: "See Salary Pledge" },
+  { dept: "Sales Team", deptSlug: "sales", title: "Acquisition Specialist", location: "Karachi", type: "On-Site", employment: "Full-Time", desc: "You convert leads into buyers. Design funnels, run outbound campaigns and optimize conversion. Revenue is the metric.", salary: "PKR 80K–100K + Commission" },
+  { dept: "Sales Team", deptSlug: "sales", title: "Retention Specialist", location: "Karachi", type: "On-Site", employment: "Full-Time", desc: "Minimize churn. Maximize loyalty. Identify at-risk clients, resolve issues, drive renewals and upsells. Retention is the compounding variable.", salary: "PKR 80K–100K + Commission" },
+  { dept: "Tech", deptSlug: "tech", title: "DevOps Engineer", location: "Karachi", type: "On-Site", employment: "Full-Time", desc: "Bridge development and operations. Automate everything, harden systems, accelerate delivery. CI/CD, infrastructure, monitoring.", salary: "See Salary Pledge" },
 ]
 
-const filters = ['All', 'Tech', 'Design', 'Product', 'Sales & BD', 'Operations']
+const filters = ["All", "Tech", "Design", "Product", "Sales & BD", "Operations"]
 
 export default function Careers() {
-  const [activeFilter, setActiveFilter] = useState('All')
-  const filtered = activeFilter === 'All' ? roles : roles.filter(r => r.dept.toLowerCase().includes(activeFilter.toLowerCase()) || r.deptSlug.toLowerCase().includes(activeFilter.toLowerCase()))
+  const [activeFilter, setActiveFilter] = useState("All")
+  const filtered = activeFilter === "All" ? roles : roles.filter(r => r.dept.toLowerCase().includes(activeFilter.toLowerCase()) || r.deptSlug.toLowerCase().includes(activeFilter.toLowerCase()))
 
   return (
     <div className="relative z-10 py-24 px-6 border-t border-white/5">
@@ -28,7 +28,7 @@ export default function Careers() {
           <div className="section-label">OPEN ROLES</div>
           <h2 className="section-title text-[clamp(3rem,7vw,7rem)]">Come Build<br />With Us.</h2>
           <p className="text-cream/50 mt-6 max-w-xl text-lg leading-relaxed">
-            We're hiring people who care about the work and are done making excuses for the places they've worked. Four roles open right now. All on-site, all in Karachi.
+            Four roles open right now. All on-site, all in Karachi.
           </p>
         </div>
 
@@ -75,7 +75,7 @@ export default function Careers() {
                     <div className="flex flex-wrap items-center gap-3 mb-3">
                       <span className="text-[9px] tracking-[0.2em] uppercase text-lime-400 border border-lime-400/30 px-2 py-1 rounded-full">{role.dept}</span>
                       <div className="flex gap-2 text-[9px] tracking-[0.15em] uppercase text-cream/30">
-                        <span>📍 {role.location}</span>
+                        <span>{role.location}</span>
                         <span>{role.type}</span>
                         <span>{role.employment}</span>
                       </div>
@@ -94,17 +94,16 @@ export default function Careers() {
             ))}
           </div>
           <p className="text-cream/25 text-xs mt-6">
-            Salary ranges shown are real and sourced from our Salary Pledge. We don't negotiate against you. All applications go to careers@feature8.com. You will get a response.
+            All applications go to careers@feature8.com. You will get a response.
           </p>
         </div>
 
         <div className="card-dark p-12 md:p-16 rounded-3xl text-center">
-          <div className="section-label flex justify-center mb-4">Don't See Your Role?</div>
           <h3 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] text-cream mb-4">
-            We're Growing.<br />Come Anyway.
+            We&apos;re Growing.<br />Come Anyway.
           </h3>
           <p className="text-cream/50 max-w-lg mx-auto mb-8 leading-relaxed">
-            If you're exceptional at something and think you belong here, send us an email. No open role needed. We'll respond.
+            If you are exceptional at something and think you belong here, send us an email. No open role needed.
           </p>
           <a href="mailto:careers@feature8.com?subject=General Application" className="btn-primary">
             Send a General Application ↗
