@@ -1,7 +1,7 @@
 'use client';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Code2, BarChart3, Video, Globe, Cpu, Building2, ShoppingBag, GraduationCap, ArrowUpRight } from 'lucide-react';
+import { Code2, BarChart3, Video, Globe, Cpu, Palette, Building2, ShoppingBag, GraduationCap, ArrowUpRight } from 'lucide-react';
 
 const SERVICES = [
   { icon: Code2, title: 'Product Development', desc: 'We build software products that solve real problems. From MVPs to full-scale platforms, we own the outcome, not just the output.', tags: ['Web Apps', 'Mobile', 'SaaS'] },
@@ -9,6 +9,7 @@ const SERVICES = [
   { icon: Video, title: 'Content Operations', desc: 'High-quality content at scale. Strategy, production, and distribution handled end-to-end.', tags: ['Video', 'Editorial', 'Social'] },
   { icon: Cpu, title: 'Infrastructure & DevOps', desc: 'Reliable, scalable, and secure. We architect and manage the systems that keep products running.', tags: ['Cloud', 'CI/CD', 'Security'] },
   { icon: Globe, title: 'Market Expansion', desc: 'Enter new markets with a plan. We handle the research, positioning, and go-to-market execution.', tags: ['Strategy', 'Partnerships', 'GTM'] },
+  { icon: Palette, title: 'Brand Development', desc: 'From identity to voice — we build brands that people remember. Strategy, design, and positioning that holds together across every touchpoint.', tags: ['Identity', 'Strategy', 'Design'] },
 ];
 
 const MARKETS = [
@@ -31,7 +32,7 @@ export default function Services() {
         <motion.div ref={ref} initial={{ opacity: 0, y: 25 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5 }} className="mb-14">
           <p className="label mb-3">What We Do</p>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <h2 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.05, color: 'white', maxWidth: 500 }}>Five Things We<br />Do Exceptionally Well.</h2>
+            <h2 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.05, color: 'white', maxWidth: 500 }}>Six Things We<br />Do Exceptionally Well.</h2>
             <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.9rem', color: 'rgba(255,255,255,0.4)', maxWidth: 380, lineHeight: 1.7 }}>We don&apos;t try to do everything. We go deep on what we&apos;re good at and find the right people to deliver it.</p>
           </div>
         </motion.div>
