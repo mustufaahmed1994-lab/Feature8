@@ -1,107 +1,120 @@
-'use client'
+'use client';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import { MessageSquare, Lightbulb, Target, Clock, Shield, BookOpen, Users, Zap, Coffee, Laptop, Heart, TrendingUp } from 'lucide-react';
 
-const values = [
-  { num:"01", title:"Ship It", desc:"The best version that never launched lost to the decent version that did. Done beats perfect. Shipped beats done." },
-  { num:"02", title:"No BS", desc:"Say what you mean. Hear what you do not want to. Own what went wrong. We do not do diplomatic vagueness." },
-  { num:"03", title:"Level Up", desc:"We will invest in you. We need you to not waste it. Curiosity is not a personality trait here. It is a job requirement." },
-  { num:"04", title:"Own It", desc:"If something matters, it is yours. Nobody is holding a permission slip. Accountability builds trust. Dodging it destroys it." },
-  { num:"05", title:"Stay Honest", desc:"With clients. With the team. With yourself. When things go wrong, honesty is the only thing that moves you forward." },
-  { num:"06", title:"Think Global", desc:"We build for the US, UK, and Canada. The standard is international. The mindset has to match." },
-  { num:"07", title:"Build Together", desc:"Solo brilliance has a ceiling. Collaborative brilliance does not. We hire people who make the people around them better." },
-  { num:"08", title:"Make It Count", desc:"Hours are not the metric. Impact is. We are not here to look busy. We are here to move something." },
-]
+const VALUES = [
+  { icon: MessageSquare, title: 'Direct Communication', desc: "Say what you mean. We don't do diplomatic vagueness or corporate-speak." },
+  { icon: Lightbulb, title: 'Ownership Mindset', desc: "Think like a founder, not an employee. It's your work, not just your job." },
+  { icon: Target, title: 'Results Over Hours', desc: "We measure output, not attendance. Quality work in less time is a win." },
+  { icon: Clock, title: 'Respect for Time', desc: "No meetings that could be messages. No processes that exist for their own sake." },
+  { icon: Shield, title: 'Psychological Safety', desc: "Raise a problem without it becoming a political event. Mistakes are learning data." },
+  { icon: BookOpen, title: 'Continuous Learning', desc: "We grow individually and together. Share what you know, ask what you don't." },
+  { icon: Users, title: 'Small, Strong Teams', desc: "We stay lean on purpose. Every person here has real impact." },
+  { icon: Zap, title: 'Bias for Action', desc: "We move fast, decide with the information we have, and course-correct as we go." },
+];
 
-const pillars = [
-  { num:"01", title:"Radical Clarity", desc:"People know what is expected of them. Feedback is specific, timely, and kind. Not vague. Not delayed. Not saved for the annual review." },
-  { num:"02", title:"Rooms Worth Being In", desc:"Your career is shaped by the conversations you are part of. Title does not buy access here. If you have something worth saying, you are in the room." },
-  { num:"03", title:"Speed Without Panic", desc:"We move fast and we know where we are going. Fast does not mean frantic. Urgency and anxiety are different things. We name it when it shows up." },
-  { num:"04", title:"Growth That is Measurable", desc:"Not a promise in an offer letter. An actual path with actual milestones. We invest in skills. We promote from within." },
-]
+const PILLARS = [
+  { label: 'Culture', value: 'Transparent by Default' },
+  { label: 'Management', value: 'Outcome-Driven' },
+  { label: 'Growth', value: 'Continuous' },
+  { label: 'Communication', value: 'Direct & Honest' },
+];
 
-const perks = [
-  { title:"The Tools", desc:"Real project management software. Not Excel. Not WhatsApp groups with 47 people." },
-  { title:"Learning Budget", desc:"A real budget for courses, certifications, and conferences. Numbers on a page you can actually spend." },
-  { title:"Health Coverage", desc:"Medical coverage for you and your immediate family. Because showing up and being well are related." },
-  { title:"Flexible Hours", desc:"Core hours exist. Outside of them, you manage your time. We track output, not attendance." },
-  { title:"Honest Management", desc:"Your manager's job is to remove blockers, not create them. HR will actually do something if that is not happening." },
-]
+const PERKS = [
+  { icon: Coffee, text: 'Fuel for your best work' },
+  { icon: Laptop, text: 'Tools that get out of your way' },
+  { icon: Heart, text: 'A team that actually gives a damn' },
+  { icon: TrendingUp, text: 'A career that compounds' },
+];
 
 export default function Culture() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const gridRef = useRef(null);
+  const gridInView = useInView(gridRef, { once: true, margin: '-60px' });
+
   return (
-    <div className="relative z-10 py-24 px-6 border-t border-white/5">
-      <div className="max-w-7xl mx-auto space-y-24">
-        <div className="reveal">
-          <div className="section-label">CULTURE AT FEATURE8</div>
-          <h2 className="section-title text-[clamp(3rem,7vw,7rem)]">Eight Things.<br />We Mean Them.</h2>
-          <p className="text-cream/50 mt-6 max-w-xl text-lg leading-relaxed">
-            Not printed on a wall. Not in an onboarding deck. These are the things we hire for, promote for, and part ways over.
-          </p>
-        </div>
+    <section className="section-pad" style={{ background: '#080808' }}>
+      <div className="max-w-screen-xl mx-auto px-6 md:px-12">
+        
+        {/* Header */}
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, y: 25 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+          className="mb-14"
+        >
+          <p className="label mb-3">Culture</p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <h2 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.05, color: 'white', maxWidth: 560 }}>
+              How We Actually Work.
+            </h2>
+            <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.9rem', color: 'rgba(255,255,255,0.4)', maxWidth: 360, lineHeight: 1.7 }}>
+              Eight principles we hold ourselves to. Not aspirational posters on the wall — the actual code we run on.
+            </p>
+          </div>
+        </motion.div>
 
-        <div>
-          <div className="mb-8">
-            <h3 className="font-display font-extrabold text-3xl text-cream">The Feature8 Code</h3>
-            <p className="text-cream/40 text-sm mt-2">Eight values. Zero exceptions.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {values.map(v => (
-              <div key={v.num} className="value-card card-dark p-6 group cursor-default transition-all duration-200">
-                <div className="font-display font-extrabold text-4xl text-cream/15 mb-4 group-hover:text-lime-400 transition-colors">{v.num}</div>
-                <div className="font-display font-extrabold text-lg text-cream mb-3">{v.title}</div>
-                <p className="text-cream/45 text-sm leading-relaxed">{v.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Culture pillars row */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12"
+        >
+          {PILLARS.map((p, i) => (
+            <div key={i} className="card-dark p-5 text-center">
+              <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '0.4rem' }}>{p.label}</p>
+              <p style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '0.9rem', color: '#b8f224' }}>{p.value}</p>
+            </div>
+          ))}
+        </motion.div>
 
-        <div>
-          <div className="mb-8">
-            <h3 className="font-display font-extrabold text-3xl text-cream">Culture Pillars</h3>
-            <p className="text-cream/40 text-sm mt-2">What it is actually like here.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pillars.map(p => (
-              <div key={p.num} className="pillar-card card-dark p-8 border border-white/5 rounded-2xl transition-colors duration-200">
-                <div className="flex items-start gap-4">
-                  <span className="text-lime-400 font-display font-extrabold text-xl">{p.num}</span>
-                  <div>
-                    <h4 className="font-display font-extrabold text-xl text-cream mb-3">{p.title}</h4>
-                    <p className="text-cream/50 text-sm leading-relaxed">{p.desc}</p>
-                  </div>
+        {/* Values grid */}
+        <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-14">
+          {VALUES.map((v, i) => {
+            const Icon = v.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                animate={gridInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                className="card-dark p-5 flex flex-col gap-3"
+              >
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(184,242,36,0.08)', border: '1px solid rgba(184,242,36,0.15)' }}>
+                  <Icon size={15} color="#b8f224" strokeWidth={1.75} />
                 </div>
-              </div>
-            ))}
-          </div>
+                <div>
+                  <h3 style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '0.9rem', color: 'white', marginBottom: '0.35rem' }}>{v.title}</h3>
+                  <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.65 }}>{v.desc}</p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
-        <div>
-          <div className="mb-8">
-            <h3 className="font-display font-extrabold text-3xl text-cream">What We Actually Offer</h3>
-            <p className="text-cream/40 text-sm mt-2">Real perks. No ping-pong table.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {perks.map(p => (
-              <div key={p.title} className="card-dark p-6">
-                <div className="text-lime-400 font-display font-extrabold text-sm tracking-widest uppercase mb-3">{p.title}</div>
-                <p className="text-cream/50 text-sm leading-relaxed">{p.desc}</p>
+        {/* Perks strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={gridInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 rounded-2xl"
+          style={{ background: 'rgba(184,242,36,0.04)', border: '1px solid rgba(184,242,36,0.12)' }}
+        >
+          {PERKS.map((perk, i) => {
+            const Icon = perk.icon;
+            return (
+              <div key={i} className="flex items-center gap-3">
+                <Icon size={16} color="#b8f224" strokeWidth={1.75} />
+                <span style={{ fontFamily: 'var(--font-inter)', fontSize: '0.82rem', color: 'rgba(255,255,255,0.6)' }}>{perk.text}</span>
               </div>
-            ))}
-          </div>
-          <p className="text-cream/25 text-sm mt-6 max-w-2xl">
-            What we do not have yet: an on-site gym, equity schemes, or a ping-pong table. When we add something, we will say so. When we cannot, we will say that too.
-          </p>
-        </div>
-
-        <div className="bg-dark-800 border border-white/5 rounded-3xl p-12 md:p-16 text-center">
-          <div className="section-label mb-6 justify-center flex">// culture in three lines</div>
-          <h2 className="font-display font-extrabold text-[clamp(2.5rem,6vw,5rem)] leading-[0.95] text-cream mb-4">
-            No Ping-Pong Table.<br />
-            <span className="text-lime-400">Just Good Work.</span>
-          </h2>
-          <p className="text-cream/50 text-lg mt-4">Finally, a Monday you don&apos;t hate.</p>
-          <a href="#careers" className="btn-primary mt-8 inline-flex">Come work here →</a>
-        </div>
+            );
+          })}
+        </motion.div>
       </div>
-    </div>
-  )
+    </section>
+  );
 }
