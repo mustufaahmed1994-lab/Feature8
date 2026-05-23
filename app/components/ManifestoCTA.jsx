@@ -1,25 +1,68 @@
-'use client'
+'use client';
+import { useState, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
+import ApplyModal from './ApplyModal';
 
 export default function ManifestoCTA() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
-    <section className="relative z-10 my-8 mx-4 md:mx-6 rounded-3xl overflow-hidden">
-      <div className="bg-lime-400 px-8 md:px-16 py-20 md:py-28">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="max-w-2xl">
-            <div className="text-[10px] tracking-[0.25em] uppercase text-dark-900/50 mb-4">READ THE MANIFESTO</div>
-            <h2 className="font-display font-extrabold text-[clamp(2rem,6vw,5rem)] leading-none tracking-tight text-dark-900">
-              We Wrote Down<br />Everything<br />We Believe.
-            </h2>
-            <p className="mt-6 text-dark-900/70 text-lg max-w-lg leading-relaxed">
-              And then we built a company around it. Every page on this site comes from that document. Worth reading before you apply.
-            </p>
-          </div>
-          <a href="#manifesto"
-            className="inline-flex items-center gap-2 bg-dark-900 text-cream font-sans font-semibold text-sm tracking-widest uppercase px-8 py-4 rounded-full hover:bg-dark-700 transition-colors self-start md:self-center flex-shrink-0">
-            READ THE MANIFESTO ↗
-          </a>
+    <>
+      <section
+        ref={ref}
+        className="section-pad"
+        style={{ background: '#b8f224' }}
+      >
+        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col md:flex-row md:items-center justify-between gap-8"
+          >
+            <div>
+              <p style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(8,8,8,0.5)', marginBottom: '0.75rem' }}>
+                Ready to Work Here?
+              </p>
+              <h2 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', lineHeight: 1.05, color: '#080808', maxWidth: 560 }}>
+                If the Manifesto Sounds Like You,<br className="hidden md:block" /> Let’s Talk.
+              </h2>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setModalOpen(true)}
+                style={{
+                  fontFamily: 'var(--font-jost)',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  padding: '0.875rem 1.5rem',
+                  borderRadius: 9999,
+                  background: '#080808',
+                  color: '#b8f224',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#111'; e.currentTarget.style.transform = 'scale(1.03)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#080808'; e.currentTarget.style.transform = 'scale(1)'; }}
+              >
+                See Open Roles <ArrowUpRight size={14} />
+              </button>
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </section>
-  )
+      </section>
+
+      <ApplyModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+    </>
+  );
 }
