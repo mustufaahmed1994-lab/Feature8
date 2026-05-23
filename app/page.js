@@ -17,12 +17,17 @@ import Footer from './components/Footer';
 export default function Home() {
   const { scrollYProgress } = useScroll();
   const scaleY = useSpring(scrollYProgress, { stiffness: 200, damping: 40 });
-  const cursorRef = useRef(null);
+
+  // Custom cursor — dot + ring
+  const dotRef = useRef(null);
+  const ringRef = useRef(null);
+  const cursorGlowRef = useRef(null);
 
   useEffect(() => {
     let animId;
     let targetX = -300, targetY = -300;
     let currentX = -300, currentY = -300;
+    let ringX = -300, ringY = -300;
 
     const handleMove = (e) => {
       targetX = e.clientX;
@@ -30,11 +35,24 @@ export default function Home() {
     };
 
     const animate = () => {
-      currentX += (targetX - currentX) * 0.08;
-      currentY += (targetY - currentY) * 0.08;
-      if (cursorRef.current) {
-        cursorRef.current.style.left = currentX + 'px';
-        cursorRef.current.style.top = currentY + 'px';
+      // Dot follows instantly
+      if (dotRef.current) {
+        dotRef.current.style.left = targetX + 'px';
+        dotRef.current.style.top = targetY + 'px';
+      }
+      // Ring follows with lag
+      ringX += (targetX - ringX) * 0.12;
+      ringY += (targetY - ringY) * 0.12;
+      if (ringRef.current) {
+        ringRef.current.style.left = ringX + 'px';
+        ringRef.current.style.top = ringY + 'px';
+      }
+      // Glow follows very slowly
+      currentX += (targetX - currentX) * 0.06;
+      currentY += (targetY - currentY) * 0.06;
+      if (cursorGlowRef.current) {
+        cursorGlowRef.current.style.left = currentX + 'px';
+        cursorGlowRef.current.style.top = currentY + 'px';
       }
       animId = requestAnimationFrame(animate);
     };
@@ -49,45 +67,28 @@ export default function Home() {
 
   return (
     <main style={{ background: '#080808', overflowX: 'hidden' }}>
-      {/* Scroll progress left edge */}
+
+      {/* Scroll progress — left edge lime bar */}
       <div style={{ position: 'fixed', left: 0, top: 0, width: 3, height: '100%', zIndex: 9999, pointerEvents: 'none' }}>
-        <motion.div
-          style={{
-            width: '100%',
-            height: '100%',
-            scaleY,
-            background: 'linear-gradient(to bottom, #b8f224, rgba(184,242,36,0.2))',
-            transformOrigin: 'top',
-            borderRadius: '0 2px 2px 0',
-          }}
-        />
+        <motion.div style={{ width: '100%', height: '100%', scaleY, background: 'linear-gradient(to bottom, #b8f224, rgba(184,242,36,0.2))', transformOrigin: 'top', borderRadius: '0 2px 2px 0' }} />
       </div>
 
-      {/* Cursor glow */}
-      <div
-        ref={cursorRef}
-        style={{
-          position: 'fixed',
-          width: 350,
-          height: 350,
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(184,242,36,0.04) 0%, transparent 70%)',
-          pointerEvents: 'none',
-          zIndex: 0,
-          transform: 'translate(-50%, -50%)',
-        }}
-      />
+      {/* Custom cursor dot */}
+      <div ref={dotRef} className="cursor-dot" />
+
+      {/* Custom cursor ring */}
+      <div ref={ringRef} className="cursor-ring" />
+
+      {/* Ambient cursor glow */}
+      <div ref={cursorGlowRef} className="cursor-glow" />
 
       <Navbar />
 
-      {/* Hero */}
       <Hero />
 
-      {/* Stats + Values (intro context — no nav anchor needed) */}
       <Stats />
       <Values />
 
-      {/* Page sections in nav order: Manifesto > Culture > Life > Careers > Salary Pledge > Services */}
       <section id="manifesto">
         <Manifesto />
         <ManifestoCTA />
