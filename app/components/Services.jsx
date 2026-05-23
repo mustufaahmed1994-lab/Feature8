@@ -1,112 +1,139 @@
-'use client'
+'use client';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import { Code2, BarChart3, Video, Globe, Cpu, Building2, ShoppingBag, GraduationCap } from 'lucide-react';
 
-const services = [
-  { num:'01', title:'Product Engineering', desc:'Full-stack web and mobile development. High-performance apps, real-time systems, scalable cloud infrastructure — built to go live and stay live.', tags:['React','TypeScript','Node.js','AWS'] },
-  { num:'02', title:'Experience Design', desc:"Research, wireframes, interaction design, design systems. Products that feel obvious to use because someone thought hard about every state.", tags:['Figma','Research','Systems'] },
-  { num:'03', title:'Growth & BD', desc:'Building pipelines, partnerships, and revenue in US, UK, and Canadian markets. Opening doors with substance, not noise.', tags:['Partnerships','Pipeline','Markets'] },
-  { num:'04', title:'Data & Intelligence', desc:"Analytics platforms, business intelligence dashboards, and data pipelines. Helping teams understand what's actually happening in their products.", tags:['Analytics','APIs','BI'] },
-  { num:'05', title:'Media & Brand', desc:'Digital content strategy, campaign technology, and brand development for tech products that need to be heard in crowded international markets.', tags:['Content','Campaigns','Brand'] },
-]
+const SERVICES = [
+  {
+    icon: Code2,
+    title: 'Product Development',
+    desc: 'We build software products that solve real problems. From MVPs to full-scale platforms, we own the outcome, not just the output.',
+    tags: ['Web Apps', 'Mobile', 'SaaS'],
+  },
+  {
+    icon: BarChart3,
+    title: 'Digital Growth',
+    desc: 'Acquisition, retention, and conversion — engineered, not guessed. We build growth systems that compound.',
+    tags: ['SEO', 'Paid Media', 'CRO'],
+  },
+  {
+    icon: Video,
+    title: 'Content Operations',
+    desc: 'High-quality content at scale. Strategy, production, and distribution handled end-to-end.',
+    tags: ['Video', 'Editorial', 'Social'],
+  },
+  {
+    icon: Cpu,
+    title: 'Infrastructure & DevOps',
+    desc: 'Reliable, scalable, and secure. We architect and manage the systems that keep products running.',
+    tags: ['Cloud', 'CI/CD', 'Security'],
+  },
+  {
+    icon: Globe,
+    title: 'Market Expansion',
+    desc: 'Enter new markets with a plan. We handle the research, positioning, and go-to-market execution.',
+    tags: ['Strategy', 'Partnerships', 'GTM'],
+  },
+];
 
-const markets = [
-  { flag:'🇺🇸', country:'United States', cities:'New York · San Francisco · Austin · Chicago', desc:"Our prime overlap window with US East Coast (EST) runs from 6 PM to 11 PM PKT. West Coast gets the 11 PM to 2 AM slot, their morning. Both work." },
-  { flag:'🇬🇧', country:'United Kingdom', cities:'London · Manchester · Edinburgh', desc:"Starting at 6 PM PKT puts us at 1 PM GMT. Their afternoon is our prime time. By the time they wrap up at 6 PM their time, we're four hours deep and moving fast." },
-  { flag:'🇨🇦', country:'Canada', cities:'Toronto · Vancouver · Calgary · Montreal', desc:'Toronto is EST — same as New York. Vancouver is PST, same window as San Francisco. Canada coverage runs simultaneously with the US. No separate scheduling needed.' },
-]
-
-const principles = [
-  { title:'Ship It Fast', desc:"We launch, learn, and iterate. A shipped product that needs improvement beats a perfect product that exists only in a Figma file. Velocity is a feature." },
-  { title:'Stay Connected', desc:"Deep overlap with international teams is not an accident. It's the model. When you're building for US and UK markets, you need to talk to those markets while they're awake." },
-  { title:'Own the Outcome', desc:"We don't build to close tickets. We build to move metrics, ship products, and grow businesses. Every team member is accountable for the outcome, not just the effort." },
-]
-
-const stats = [
-  { val:'3', label:'International Markets' },
-  { val:'9h', label:'Standard Shift' },
-  { val:'6–6', label:'Operating Hours' },
-  { val:'0→1', label:'Where We Play' },
-]
+const MARKETS = [
+  { icon: Building2, name: 'Enterprise', desc: 'Large organisations with complex digital needs' },
+  { icon: ShoppingBag, name: 'SME', desc: 'Growing businesses ready to scale their online presence' },
+  { icon: GraduationCap, name: 'Institutions', desc: 'Educational and non-profit organisations' },
+];
 
 export default function Services() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+  const gridRef = useRef(null);
+  const gridInView = useInView(gridRef, { once: true, margin: '-60px' });
+
   return (
-    <div className="relative z-10 py-24 px-6 border-t border-white/5">
-      <div className="max-w-7xl mx-auto space-y-24">
-        <div className="reveal">
-          <div className="section-label">// what we actually build</div>
-          <h2 className="section-title text-[clamp(3rem,7vw,7rem)]">We Build Things<br />That Actually Ship.</h2>
-          <p className="text-cream/50 mt-6 max-w-xl text-lg leading-relaxed">
-            Five disciplines. One team. A global market spanning the US, UK, and Canada.
-          </p>
-          <div className="flex flex-wrap gap-8 mt-10">
-            {stats.map(s => (
-              <div key={s.label}>
-                <div className="font-display font-extrabold text-4xl text-lime-400">{s.val}</div>
-                <div className="text-cream/40 text-xs tracking-[0.15em] uppercase mt-1">{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+    <section className="section-pad" style={{ background: '#0a0a0a', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+      <div className="max-w-screen-xl mx-auto px-6 md:px-12">
 
-        <div>
-          <div className="mb-8">
-            <h3 className="font-display font-extrabold text-2xl text-cream">Our Work Areas</h3>
-            <p className="text-cream/40 text-sm mt-2">Five disciplines. All of them serious.</p>
+        {/* Header */}
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, y: 25 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+          className="mb-14"
+        >
+          <p className="label mb-3">What We Do</p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <h2 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.05, color: 'white', maxWidth: 500 }}>
+              Five Things We<br />Do Exceptionally Well.
+            </h2>
+            <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.9rem', color: 'rgba(255,255,255,0.4)', maxWidth: 380, lineHeight: 1.7 }}>
+              We don’t try to do everything. We go deep on what we’re good at and find the right people to deliver it.
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {services.map(s => (
-              <div key={s.num} className="service-card card-dark p-8">
-                <div className="service-num font-display font-extrabold text-5xl text-cream/10 mb-4 transition-colors duration-200">{s.num}</div>
-                <h4 className="font-display font-extrabold text-xl text-cream mb-3">{s.title}</h4>
-                <p className="text-cream/50 text-sm leading-relaxed mb-6">{s.desc}</p>
-                <div className="flex flex-wrap gap-2">
-                  {s.tags.map(t => (
-                    <span key={t} className="text-[9px] tracking-[0.15em] uppercase text-lime-400/60 border border-lime-400/20 px-2 py-1 rounded-full">{t}</span>
-                  ))}
+        </motion.div>
+
+        {/* Services grid */}
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
+          {SERVICES.map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                animate={gridInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: i * 0.09, ease: [0.22, 1, 0.36, 1] }}
+                className="card-dark p-6 flex flex-col gap-5"
+                style={i === 4 ? { gridColumn: 'span 1' } : {}}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: 'rgba(184,242,36,0.08)', border: '1px solid rgba(184,242,36,0.18)' }}>
+                    <Icon size={18} color="#b8f224" strokeWidth={1.6} />
+                  </div>
+                  <div className="flex flex-wrap gap-1 justify-end max-w-32">
+                    {s.tags.map(t => (
+                      <span key={t} className="tag" style={{ fontSize: '0.6rem', padding: '0.15rem 0.5rem' }}>{t}</span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+                <div>
+                  <h3 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: '1.2rem', color: 'white', marginBottom: '0.6rem', letterSpacing: '-0.01em' }}>
+                    {s.title}
+                  </h3>
+                  <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.83rem', color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>
+                    {s.desc}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
-        <div>
-          <div className="mb-8">
-            <h3 className="font-display font-extrabold text-2xl text-cream">International Markets</h3>
-            <p className="text-cream/40 text-sm mt-2">Three Markets. One Operating Rhythm.</p>
-          </div>
+        {/* Markets section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={gridInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <p className="label mb-6">Markets We Serve</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {markets.map(m => (
-              <div key={m.country} className="card-dark p-8">
-                <div className="text-4xl mb-4">{m.flag}</div>
-                <h4 className="font-display font-extrabold text-xl text-cream mb-1">{m.country}</h4>
-                <p className="text-lime-400 text-xs tracking-[0.1em] mb-4">{m.cities}</p>
-                <p className="text-cream/50 text-sm leading-relaxed">{m.desc}</p>
-              </div>
-            ))}
+            {MARKETS.map((m, i) => {
+              const Icon = m.icon;
+              return (
+                <div key={i} className="card-dark p-5 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <Icon size={17} color="rgba(255,255,255,0.5)" strokeWidth={1.6} />
+                  </div>
+                  <div>
+                    <p style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '0.95rem', color: 'white', marginBottom: '0.2rem' }}>{m.name}</p>
+                    <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.78rem', color: 'rgba(255,255,255,0.38)' }}>{m.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
-
-        <div>
-          <div className="mb-8">
-            <h3 className="font-display font-extrabold text-2xl text-cream">How We Work</h3>
-            <p className="text-cream/40 text-sm mt-2">Three principles. Not negotiable.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {principles.map(p => (
-              <div key={p.title} className="card-dark p-8">
-                <div className="text-lime-400 font-display font-extrabold text-sm tracking-widest uppercase mb-3">{p.title}</div>
-                <p className="text-cream/55 text-sm leading-relaxed">{p.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="text-center">
-          <div className="section-label flex justify-center mb-4">Find Your Role</div>
-          <h3 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] text-cream mb-4">See Where You Fit.</h3>
-          <p className="text-cream/50 mb-8">Five work areas. Four open roles right now.</p>
-          <a href="#careers" className="btn-primary">Browse Open Roles →</a>
-        </div>
+        </motion.div>
       </div>
-    </div>
-  )
+    </section>
+  );
 }
