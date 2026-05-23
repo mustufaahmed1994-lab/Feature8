@@ -15,13 +15,9 @@
   --font-body: var(--font-inter);
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   background-color: var(--dark);
@@ -29,11 +25,55 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  cursor: none; /* custom cursor active */
 }
 
 /* =====================
-   TYPOGRAPHY - Widow/Orphan Control
-   ===================== */
+CUSTOM CURSOR
+===================== */
+
+/* Small precise dot */
+.cursor-dot {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b8f224;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+  mix-blend-mode: difference;
+}
+
+/* Larger ring that follows with lag */
+.cursor-ring {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(184,242,36,0.5);
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: width 0.25s ease, height 0.25s ease, border-color 0.2s ease, opacity 0.3s ease;
+}
+
+body:has(a:hover) .cursor-ring,
+body:has(button:hover) .cursor-ring {
+  width: 52px;
+  height: 52px;
+  border-color: rgba(184,242,36,0.8);
+}
+
+@media (pointer: coarse) {
+  body { cursor: auto; }
+  .cursor-dot, .cursor-ring { display: none; }
+}
+
+/* =====================
+TYPOGRAPHY - Widow/Orphan Control
+===================== */
 
 p, li, blockquote {
   text-wrap: pretty;
@@ -60,43 +100,60 @@ h4, h5, h6 {
   font-weight: 600;
 }
 
-.font-display {
-  font-family: var(--font-barlow), system-ui, sans-serif;
+.font-display { font-family: var(--font-barlow), system-ui, sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+.font-logo { font-family: var(--font-jost), system-ui, sans-serif; font-weight: 700; }
+.font-body { font-family: var(--font-inter), system-ui, sans-serif; }
+
+/* =====================
+MINIMUM FONT SIZES - Accessibility
+===================== */
+
+/* Ensure no text is below 11px */
+.label {
+  font-family: var(--font-jost), sans-serif;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 0.72rem; /* 11.5px - was 0.62rem (9.9px) */
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lime);
+  display: block;
 }
 
-.font-logo {
-  font-family: var(--font-jost), system-ui, sans-serif;
-  font-weight: 700;
-}
-
-.font-body {
-  font-family: var(--font-inter), system-ui, sans-serif;
+/* Ensure section meta labels are readable */
+.section-meta {
+  font-size: 0.72rem !important;
+  min-font-size: 11px;
 }
 
 /* =====================
-   SCROLLBAR
-   ===================== */
+SCROLL-REVEAL CONTRAST FIX
+===================== */
+
+/* Framer Motion initial state for scroll reveals - 
+   start at 0.4 opacity minimum for accessibility */
+[data-motion-initial-opacity] {
+  opacity: 0.4 !important;
+}
+
+/* =====================
+SCROLLBAR
+===================== */
 
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: var(--dark); }
 ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--lime); }
 
-::selection {
-  background: var(--lime);
-  color: var(--dark);
-}
+::selection { background: var(--lime); color: var(--dark); }
 
 /* =====================
-   CURSOR GLOW
-   ===================== */
+CURSOR GLOW (ambient)
+===================== */
 
 .cursor-glow {
   position: fixed;
-  width: 320px;
-  height: 320px;
+  width: 350px;
+  height: 350px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(184,242,36,0.045) 0%, transparent 70%);
   pointer-events: none;
@@ -105,8 +162,8 @@ h4, h5, h6 {
 }
 
 /* =====================
-   BUTTONS
-   ===================== */
+BUTTONS
+===================== */
 
 .btn-lime {
   background: var(--lime);
@@ -123,7 +180,7 @@ h4, h5, h6 {
   gap: 0.35rem;
   transition: all 0.2s ease;
   border: none;
-  cursor: pointer;
+  cursor: none;
   white-space: nowrap;
 }
 
@@ -148,7 +205,7 @@ h4, h5, h6 {
   align-items: center;
   gap: 0.35rem;
   transition: all 0.2s ease;
-  cursor: pointer;
+  cursor: none;
 }
 
 .btn-outline:hover {
@@ -158,18 +215,8 @@ h4, h5, h6 {
 }
 
 /* =====================
-   LABELS / TAGS
-   ===================== */
-
-.label {
-  font-family: var(--font-jost), sans-serif;
-  font-weight: 700;
-  font-size: 0.62rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--lime);
-  display: block;
-}
+LABELS / TAGS
+===================== */
 
 .tag {
   font-family: var(--font-inter), sans-serif;
@@ -190,8 +237,8 @@ h4, h5, h6 {
 }
 
 /* =====================
-   CARDS
-   ===================== */
+CARDS
+===================== */
 
 .card-dark {
   background: rgba(255,255,255,0.03);
@@ -208,26 +255,20 @@ h4, h5, h6 {
 }
 
 /* =====================
-   DIVIDERS / SECTION
-   ===================== */
+DIVIDERS / SECTION
+===================== */
 
-.divider {
-  width: 100%;
-  height: 1px;
-  background: rgba(255,255,255,0.07);
-}
+.divider { width: 100%; height: 1px; background: rgba(255,255,255,0.07); }
 
-.section-pad {
-  padding: 6rem 0;
-}
+.section-pad { padding: 6rem 0; }
 
 @media (max-width: 768px) {
   .section-pad { padding: 4rem 0; }
 }
 
 /* =====================
-   APPLY MODAL
-   ===================== */
+APPLY MODAL
+===================== */
 
 .modal-backdrop {
   position: fixed;
@@ -254,11 +295,7 @@ h4, h5, h6 {
 }
 
 @media (max-width: 640px) {
-  .modal-panel {
-    max-height: 95vh;
-    border-radius: 16px;
-    padding: 1.5rem;
-  }
+  .modal-panel { max-height: 95vh; border-radius: 16px; padding: 1.5rem; }
 }
 
 .modal-panel::-webkit-scrollbar { width: 2px; }
@@ -276,32 +313,29 @@ h4, h5, h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: none;
   transition: all 0.2s;
   color: rgba(255,255,255,0.5);
 }
 
-.modal-close:hover {
-  background: rgba(255,255,255,0.12);
-  color: white;
-}
+.modal-close:hover { background: rgba(255,255,255,0.12); color: white; }
 
 .form-group { display: flex; flex-direction: column; gap: 0.375rem; }
 
 .form-label {
   font-family: var(--font-jost), sans-serif;
-  font-size: 0.65rem;
+  font-size: 0.7rem; /* was 0.65rem - bumped for readability */
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.5); /* was 0.45 - bumped for contrast */
 }
 
 .form-label span {
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
-  color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.32); /* was 0.28 - bumped */
   font-size: 0.63rem;
   margin-left: 0.3rem;
 }
@@ -320,7 +354,7 @@ h4, h5, h6 {
   -webkit-appearance: none;
 }
 
-.form-input::placeholder { color: rgba(255,255,255,0.22); }
+.form-input::placeholder { color: rgba(255,255,255,0.25); }
 
 .form-input:focus {
   border-color: var(--lime);
@@ -346,18 +380,14 @@ h4, h5, h6 {
   border: 1px dashed rgba(255,255,255,0.13);
   border-radius: 10px;
   padding: 0.75rem 1rem;
-  cursor: pointer;
+  cursor: none;
   transition: all 0.2s;
   color: rgba(255,255,255,0.45);
   font-family: var(--font-inter), sans-serif;
   font-size: 0.8rem;
 }
 
-.form-file-label:hover {
-  border-color: var(--lime);
-  color: var(--lime);
-  background: rgba(184,242,36,0.04);
-}
+.form-file-label:hover { border-color: var(--lime); color: var(--lime); background: rgba(184,242,36,0.04); }
 
 .job-item {
   display: flex;
@@ -366,7 +396,7 @@ h4, h5, h6 {
   padding: 1rem 1.25rem;
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 12px;
-  cursor: pointer;
+  cursor: none;
   transition: all 0.2s;
   background: rgba(255,255,255,0.02);
 }
@@ -378,8 +408,8 @@ h4, h5, h6 {
 }
 
 /* =====================
-   ACCORDION
-   ===================== */
+ACCORDION
+===================== */
 
 .accordion-trigger {
   width: 100%;
@@ -387,7 +417,7 @@ h4, h5, h6 {
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem 0;
-  cursor: pointer;
+  cursor: none;
   border: none;
   background: transparent;
   text-align: left;
@@ -398,8 +428,8 @@ h4, h5, h6 {
 .accordion-trigger:hover { color: var(--lime); }
 
 /* =====================
-   TICKER
-   ===================== */
+TICKER
+===================== */
 
 .ticker-wrap { overflow: hidden; white-space: nowrap; }
 
@@ -414,14 +444,11 @@ h4, h5, h6 {
 }
 
 /* =====================
-   SECTION TRANSITIONS
-   ===================== */
+SECTION TRANSITIONS
+===================== */
 
-section {
-  position: relative;
-}
+section { position: relative; }
 
-/* Dynamic shimmer on cards */
 @keyframes shimmer {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
@@ -434,8 +461,8 @@ section {
 }
 
 /* =====================
-   MOBILE MENU
-   ===================== */
+MOBILE MENU
+===================== */
 
 .mobile-menu {
   position: fixed;
@@ -449,8 +476,8 @@ section {
 }
 
 /* =====================
-   RESPONSIVE
-   ===================== */
+RESPONSIVE
+===================== */
 
 @media (max-width: 768px) {
   h1 { font-size: clamp(2.5rem, 10vw, 5rem); }
@@ -458,10 +485,14 @@ section {
 }
 
 /* =====================
-   FOCUS / LINK
-   ===================== */
+FOCUS / LINK / ACCESSIBILITY
+===================== */
 
 *:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
 
 .hover-lime { transition: color 0.15s; }
 .hover-lime:hover { color: var(--lime); }
+
+/* Re-enable cursor for native inputs */
+input, textarea, select { cursor: text; }
+a, button { cursor: none; }
