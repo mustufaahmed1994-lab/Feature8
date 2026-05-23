@@ -496,3 +496,29 @@ FOCUS / LINK / ACCESSIBILITY
 /* Re-enable cursor for native inputs */
 input, textarea, select { cursor: text; }
 a, button { cursor: none; }
+
+/* =====================
+   SKIP LINK - Accessibility
+   ===================== */
+
+/* CSS-only show on keyboard focus (no JS event handlers needed in Server Components) */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 1rem;
+  background: #b8f224;
+  color: #080808;
+  padding: 0.5rem 1rem;
+  border-radius: 0 0 8px 8px;
+  font-family: var(--font-jost), sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  z-index: 99999;
+  transition: top 0.2s;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: none;
+}
