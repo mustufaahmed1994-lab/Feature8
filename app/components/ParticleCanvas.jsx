@@ -34,17 +34,15 @@ function simplex2(xin, yin) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Caustic layer config — each layer has its own noise offsets, scale, speed
-// The vein threshold and width define how fine/broad the caustic lines are
+// Render at 1/4 resolution then scale up — gives smooth bilinear caustic veins
+// with zero pixelation. Each layer adds a different noise octave.
+const SCALE = 4   // downscale factor (higher = faster, smoother)
 const LAYERS = [
-  { ox:  0.00, oy:  0.00, scale: 2.8, speed: 0.00012, thresh: 0.68, lineW: 1.8, alpha: 0.70 },
-  { ox: 17.30, oy:  5.50, scale: 4.2, speed: 0.00017, thresh: 0.72, lineW: 1.2, alpha: 0.55 },
-  { ox:  8.10, oy: 23.40, scale: 6.5, speed: 0.00009, thresh: 0.75, lineW: 0.7, alpha: 0.40 },
-  { ox: 31.00, oy: 12.70, scale: 3.5, speed: 0.00021, thresh: 0.70, lineW: 1.0, alpha: 0.30 },
+  { ox:  0.0, oy:  0.0,  freq: 2.6, speed: 0.00014, thresh: 0.66, brightness: 1.00 },
+  { ox: 17.3, oy:  5.5,  freq: 4.1, speed: 0.00020, thresh: 0.70, brightness: 0.70 },
+  { ox:  8.1, oy: 23.4,  freq: 6.8, speed: 0.00009, thresh: 0.74, brightness: 0.45 },
+  { ox: 31.0, oy: 12.7,  freq: 3.3, speed: 0.00025, thresh: 0.68, brightness: 0.35 },
 ]
-
-// Sample resolution — lower = more detail but heavier CPU (20 is a good balance)
-const STEP = 20
 
 export default function ParticleCanvas() {
   const canvasRef = useRef(null)
@@ -56,12 +54,18 @@ export default function ParticleCanvas() {
     let animId
     let W = 0, H = 0
     let t = 0
-    let targetMx = 0.62, targetMy = 0.35
-    let smoothMx = 0.62, smoothMy = 0.35
+    let targetMx = 0.65, targetMy = 0.30
+    let smoothMx = 0.65, smoothMy = 0.30
+
+    // Low-res offscreen canvas — written as ImageData, drawn scaled to full canvas
+    const lo = document.createElement('canvas')
+    const lctx = lo.getContext('2d', { alpha: true, willReadFrequently: true })
 
     const resize = () => {
       W = canvas.width  = window.innerWidth
       H = canvas.height = window.innerHeight
+      lo.width  = Math.ceil(W  / SCALE)
+      lo.height = Math.ceil(H / SCALE)
     }
     resize()
     window.addEventListener('resize', resize, { passive: true })
@@ -71,116 +75,126 @@ export default function ParticleCanvas() {
     }
     window.addEventListener('mousemove', onMove, { passive: true })
 
-    // Off-screen buffer for caustic veins (drawn once per frame, then bloom-blurred onto main canvas)
-    const buf  = document.createElement('canvas')
-    const bctx = buf.getContext('2d', { alpha: true })
-    // Second buffer for bloom pass
-    const bloom  = document.createElement('canvas')
-    const blctx  = bloom.getContext('2d', { alpha: true })
-
     const draw = () => {
       t++
       smoothMx += (targetMx - smoothMx) * 0.04
       smoothMy += (targetMy - smoothMy) * 0.04
 
-      if (buf.width !== W || buf.height !== H) {
-        buf.width = W; buf.height = H
-        bloom.width = W; bloom.height = H
+      const lW = lo.width, lH = lo.height
+      const img = lctx.createImageData(lW, lH)
+      const data = img.data
+
+      // Focal centre in low-res coords — right-of-centre, upper area
+      const fcx = lW * (0.62 + smoothMx * 0.08)
+      const fcy = lH * (0.30 + smoothMy * 0.06)
+      // Max radial distance for vignette
+      const maxD = Math.sqrt(lW * lW + lH * lH) * 0.55
+
+      // Mouse warp offsets
+      const mwx = (smoothMx - 0.5) * 0.22
+      const mwy = (smoothMy - 0.5) * 0.14
+
+      for (let py = 0; py < lH; py++) {
+        for (let px = 0; px < lW; px++) {
+          // Fractional position (0..1)
+          const fx = px / lW, fy = py / lH
+
+          // Only compute right portion of screen (left 30% stays dark)
+          if (fx < 0.22) { continue }
+          // Only compute top 80%
+          if (fy > 0.82) { continue }
+
+          // Radial fade from focal point — smooth falloff
+          const dx = (px - fcx) / lW, dy = (py - fcy) / lH
+          const dist = Math.sqrt(dx*dx * 1.5 + dy*dy)
+          const radFade = Math.max(0, 1 - dist * 1.6)
+          if (radFade < 0.01) continue
+
+          // Edge fades for natural dissolution
+          const edgeL = Math.min(1, (fx - 0.22) / 0.12)
+          const edgeR = Math.min(1, (1.0 - fx) / 0.08)
+          const edgeT = Math.min(1, (fy + 0.05) / 0.06)
+          const edgeB = Math.min(1, (0.82 - fy) / 0.14)
+          const edgeFade = Math.min(edgeL, edgeR, edgeT, edgeB)
+          if (edgeFade <= 0) continue
+
+          const combine = radFade * edgeFade
+
+          // Sample all noise layers and accumulate
+          let totalR = 0, totalG = 0, totalB = 0, totalA = 0
+
+          LAYERS.forEach(L => {
+            const time = t * L.speed
+            const nx = fx * L.freq + L.ox + time + mwx
+            const ny = fy * L.freq + L.oy + time * 0.65 + mwy
+            const raw = simplex2(nx, ny)
+            const v = Math.abs(raw)  // fold to 0..1
+
+            if (v < L.thresh) return
+
+            // Sharp vein brightness — thin bright lines above threshold
+            const vein = Math.pow((v - L.thresh) / (1 - L.thresh), 0.45)
+
+            const a = vein * combine * L.brightness
+
+            // Color: bright yellow-lime core fading to deeper lime at edges
+            // Core: rgba(240,255,160) — hot white-lime
+            // Mid:  rgba(184,242,36)  — brand lime
+            // Edge: rgba(80,160,20)   — deep lime
+            const coreMix = Math.pow(vein, 1.8)
+            const r = Math.round(80  + coreMix * (240 - 80))
+            const g = Math.round(160 + coreMix * (255 - 160))
+            const b = Math.round(20  + coreMix * (160 - 20))
+
+            // Additive blend in float (max to avoid oversaturation)
+            totalR = Math.min(255, totalR + r * a)
+            totalG = Math.min(255, totalG + g * a)
+            totalB = Math.min(255, totalB + b * a)
+            totalA = Math.min(1,   totalA + a * 0.92)
+          })
+
+          if (totalA < 0.005) continue
+          const idx = (py * lW + px) * 4
+          data[idx]   = Math.round(totalR)
+          data[idx+1] = Math.round(totalG)
+          data[idx+2] = Math.round(totalB)
+          data[idx+3] = Math.round(totalA * 255)
+        }
       }
 
-      bctx.clearRect(0, 0, W, H)
+      lctx.putImageData(img, 0, 0)
 
-      // ── Draw caustic veins per layer ─────────────────────────────────────
-      // Region: upper-right quadrant (right 65%, top 70% of viewport)
-      // Caustic veins are lit wherever |noise| exceeds the threshold — this
-      // creates the bright narrow-vein look of real water caustics.
-      const regionX0 = W * 0.28   // veins start 28% from left
-      const regionY0 = 0
-      const regionX1 = W * 1.00
-      const regionY1 = H * 0.78   // veins stop at 78% height
-      const rW = regionX1 - regionX0
-      const rH = regionY1 - regionY0
-
-      LAYERS.forEach(L => {
-        const time = t * L.speed
-        // Mouse adds a gentle distortion warp to the noise coordinates
-        const mwarpX = (smoothMx - 0.5) * 0.18
-        const mwarpY = (smoothMy - 0.5) * 0.12
-
-        for (let py = regionY0; py < regionY1; py += STEP) {
-          for (let px = regionX0; px < regionX1; px += STEP) {
-            const nx = (px / W) * L.scale + L.ox + time + mwarpX
-            const ny = (py / H) * L.scale + L.oy + time * 0.7 + mwarpY
-            const raw = simplex2(nx, ny)  // -1..1 range
-            const v = Math.abs(raw)        // fold to 0..1
-
-            if (v >= L.thresh) {
-              // Brightness ramps sharply from threshold to 1 — creates thin bright veins
-              const bright = Math.pow((v - L.thresh) / (1 - L.thresh), 0.5)
-
-              // Fade at region boundaries so veins dissolve naturally at edges
-              const fadeX = Math.min(1,
-                Math.min((px - regionX0) / (rW * 0.18), (regionX1 - px) / (rW * 0.14))
-              )
-              const fadeY = Math.min(1,
-                Math.min((py - regionY0 + 40) / (rH * 0.12), (regionY1 - py) / (rH * 0.20))
-              )
-              const fade = Math.min(fadeX, fadeY)
-
-              // Also fade based on distance from a "focal point" in upper-right
-              const fx = W * (0.58 + smoothMx * 0.10)
-              const fy = H * (0.22 + smoothMy * 0.08)
-              const dist = Math.sqrt(((px-fx)/W)*((px-fx)/W)*1.6 + ((py-fy)/H)*((py-fy)/H))
-              const radFade = Math.max(0, 1 - dist * 1.35)
-
-              const finalAlpha = bright * fade * radFade * L.alpha
-              if (finalAlpha < 0.01) continue
-
-              // Core vein — lime white-hot center
-              bctx.globalAlpha = finalAlpha
-              bctx.fillStyle = `rgba(220,255,140,${Math.min(bright * 0.9, 1).toFixed(3)})`
-              bctx.fillRect(px - L.lineW * 0.5, py - L.lineW * 0.5, L.lineW * STEP * 0.55, L.lineW * STEP * 0.55)
-
-              // Outer lime halo
-              bctx.globalAlpha = finalAlpha * 0.45
-              bctx.fillStyle = `rgba(184,242,36,${(bright * 0.6).toFixed(3)})`
-              bctx.fillRect(px - L.lineW, py - L.lineW, L.lineW * STEP * 0.9, L.lineW * STEP * 0.9)
-            }
-          }
-        }
-      })
-      bctx.globalAlpha = 1
-
-      // ── Bloom pass ────────────────────────────────────────────────────────
-      // Draw the vein buffer offset in 8 directions at low alpha to feather/bloom
-      blctx.clearRect(0, 0, W, H)
-      const offsets = [[-10,-10],[0,-10],[10,-10],[-10,0],[10,0],[-10,10],[0,10],[10,10]]
-      offsets.forEach(([dx,dy]) => {
-        blctx.globalAlpha = 0.13
-        blctx.drawImage(buf, dx, dy)
-      })
-      // Wider, softer bloom ring
-      const off2 = [[-22,-22],[0,-22],[22,-22],[-22,0],[22,0],[-22,22],[0,22],[22,22]]
-      off2.forEach(([dx,dy]) => {
-        blctx.globalAlpha = 0.06
-        blctx.drawImage(buf, dx, dy)
-      })
-      blctx.globalAlpha = 1
-
-      // ── Composite onto main canvas ────────────────────────────────────────
+      // ── Composite to main canvas with scaling (bilinear) ─────────────────
       ctx.clearRect(0, 0, W, H)
-      ctx.drawImage(bloom, 0, 0)   // soft bloom layer under sharp veins
-      ctx.drawImage(buf,   0, 0)   // sharp vein layer on top
+
+      // Bloom: draw scaled lo-res at slight offsets at low alpha for glow
+      ctx.globalAlpha = 0.22
+      const bOff = 3 * SCALE  // bloom offset in full-res pixels
+      const blOffsets = [[-bOff,-bOff],[0,-bOff],[bOff,-bOff],[-bOff,0],[bOff,0],[-bOff,bOff],[0,bOff],[bOff,bOff]]
+      blOffsets.forEach(([dx,dy]) => {
+        ctx.drawImage(lo, dx, dy, W + Math.abs(dx), H + Math.abs(dy))
+      })
+
+      // Wider softer bloom ring
+      ctx.globalAlpha = 0.09
+      const bOff2 = 6 * SCALE
+      const blOffsets2 = [[-bOff2,-bOff2],[0,-bOff2],[bOff2,-bOff2],[-bOff2,0],[bOff2,0],[-bOff2,bOff2],[0,bOff2],[bOff2,bOff2]]
+      blOffsets2.forEach(([dx,dy]) => {
+        ctx.drawImage(lo, dx, dy, W, H)
+      })
+
+      // Sharp caustic layer
+      ctx.globalAlpha = 1
+      ctx.drawImage(lo, 0, 0, W, H)
 
       // ── Vignette ─────────────────────────────────────────────────────────
-      // Strong vignette: everything except the upper-right focal zone goes dark
-      const vx = W * 0.72, vy = H * 0.28
-      const vign = ctx.createRadialGradient(vx, vy, 0, vx, vy, Math.max(W, H) * 0.72)
+      const vx = W * 0.68, vy = H * 0.28
+      const vign = ctx.createRadialGradient(vx, vy, 0, vx, vy, Math.max(W, H) * 0.75)
       vign.addColorStop(0,    'rgba(8,8,8,0)')
-      vign.addColorStop(0.35, 'rgba(8,8,8,0.05)')
-      vign.addColorStop(0.65, 'rgba(8,8,8,0.45)')
-      vign.addColorStop(0.85, 'rgba(8,8,8,0.75)')
-      vign.addColorStop(1,    'rgba(8,8,8,0.95)')
+      vign.addColorStop(0.28, 'rgba(8,8,8,0)')
+      vign.addColorStop(0.60, 'rgba(8,8,8,0.40)')
+      vign.addColorStop(0.82, 'rgba(8,8,8,0.72)')
+      vign.addColorStop(1,    'rgba(8,8,8,0.96)')
       ctx.fillStyle = vign
       ctx.fillRect(0, 0, W, H)
 
