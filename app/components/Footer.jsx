@@ -1,7 +1,17 @@
 'use client';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { ArrowUpRight, Linkedin, Instagram, Twitter } from 'lucide-react';
+import { ArrowUpRight, Linkedin, Instagram } from 'lucide-react';
+
+// Custom YouTube icon (not in Lucide)
+function YoutubeIcon({ size = 16 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
+      <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" />
+    </svg>
+  );
+}
 
 const scrollTo = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); };
 
@@ -16,8 +26,8 @@ const NAV = [
 
 const SOCIALS = [
   { icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/company/feature8' },
-  { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/feature8.pk/' },
-  { icon: Twitter, label: 'X / Twitter', href: 'https://twitter.com/feature8pk' },
+  { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/feature8_/' },
+  { icon: YoutubeIcon, label: 'YouTube', href: 'https://www.youtube.com/@Feature_8' },
 ];
 
 export default function Footer() {
@@ -52,7 +62,7 @@ export default function Footer() {
 
         {/* Three-col grid */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5, delay: 0.1 }} className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16 mb-12">
-          
+
           {/* Socials */}
           <div>
             <p style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.22)', marginBottom: '1.25rem' }}>Follow</p>
