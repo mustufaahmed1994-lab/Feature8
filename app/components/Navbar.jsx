@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import ApplyModal from './ApplyModal';
 
-// Nav order matches page scroll order exactly
 const NAV_LINKS = [
   { label: 'Manifesto', href: '#manifesto' },
   { label: 'Culture', href: '#culture' },
@@ -50,81 +49,34 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.2 }}
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-8"
-        style={{
-          height: 56,
-          background: scrolled ? 'rgba(8,8,8,0.93)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(18px)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
-          transition: 'background 0.3s, backdrop-filter 0.3s',
-        }}
+        style={{ height: 56, background: scrolled ? 'rgba(8,8,8,0.93)' : 'transparent', backdropFilter: scrolled ? 'blur(18px)' : 'none', borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none', transition: 'background 0.3s, backdrop-filter 0.3s' }}
       >
         {/* Logo */}
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          style={{
-            fontFamily: 'var(--font-jost)',
-            fontWeight: 700,
-            fontSize: '1.05rem',
-            letterSpacing: '-0.02em',
-            color: 'white',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 0,
-            lineHeight: 1,
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '0.08em',
-          }}
-          aria-label="Feature8 home"
-        >
+        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '1.05rem', letterSpacing: '-0.02em', color: 'white', background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 1, display: 'flex', alignItems: 'flex-start', gap: '0.08em' }}
+          aria-label="Feature8 home">
           <span>Feature</span>
           <span style={{ color: '#b8f224', fontSize: '0.72em', fontWeight: 800, lineHeight: 1, marginTop: '0.05em' }}>8</span>
         </button>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center">
+        {/* Desktop nav — pill active state */}
+        <div className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map(link => {
             const id = link.href.replace('#', '');
             const isActive = active === id;
             return (
-              <button
-                key={link.label}
-                onClick={() => scrollTo(link.href)}
+              <button key={link.label} onClick={() => scrollTo(link.href)}
                 style={{
-                  fontFamily: 'var(--font-jost)',
-                  fontWeight: 600,
-                  fontSize: '0.68rem',
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  padding: '0.5rem 0.8rem',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: isActive ? '#b8f224' : 'rgba(255,255,255,0.5)',
-                  transition: 'color 0.2s',
-                  position: 'relative',
+                  fontFamily: 'var(--font-jost)', fontWeight: isActive ? 700 : 600,
+                  fontSize: '0.68rem', letterSpacing: '0.08em', textTransform: 'uppercase',
+                  padding: '0.4rem 0.75rem', borderRadius: 9999, background: isActive ? 'rgba(184,242,36,0.14)' : 'transparent',
+                  border: isActive ? '1px solid rgba(184,242,36,0.3)' : '1px solid transparent',
+                  cursor: 'pointer', color: isActive ? '#b8f224' : 'rgba(255,255,255,0.5)', transition: 'all 0.2s',
                 }}
-                onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = 'rgba(255,255,255,0.9)'; }}
-                onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
+                onMouseEnter={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.9)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; } }}
+                onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.background = 'transparent'; } }}
               >
                 {link.label}
-                {isActive && (
-                  <motion.span
-                    layoutId="nav-dot"
-                    style={{
-                      position: 'absolute',
-                      bottom: 3,
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: 3,
-                      height: 3,
-                      borderRadius: '50%',
-                      background: '#b8f224',
-                      display: 'block',
-                    }}
-                  />
-                )}
               </button>
             );
           })}
@@ -133,75 +85,47 @@ export default function Navbar() {
         {/* CTA + hamburger */}
         <div className="flex items-center gap-3">
           <button onClick={() => setModalOpen(true)} className="btn-lime hidden sm:inline-flex">
-            <span>We&apos;re Hiring</span>
-            <ArrowUpRight size={13} />
+            <span>We&apos;re Hiring</span><ArrowUpRight size={13} />
           </button>
-          <button
-            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg"
+          <button className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg"
             style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}
-            onClick={() => setMenuOpen(v => !v)}
-          >
+            onClick={() => setMenuOpen(v => !v)} aria-label="Toggle menu">
             {menuOpen ? <X size={16} /> : <Menu size={16} />}
           </button>
         </div>
       </motion.nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — full screen with large links */}
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
-            className="mobile-menu"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.22 }}
-          >
+          <motion.div className="mobile-menu" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.22 }}>
             <div className="flex items-center justify-between mb-10">
               <span style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '1.05rem', display: 'flex', alignItems: 'flex-start', gap: '0.08em' }}>
-                <span>Feature</span>
-                <span style={{ color: '#b8f224', fontSize: '0.72em', fontWeight: 800 }}>8</span>
+                <span>Feature</span><span style={{ color: '#b8f224', fontSize: '0.72em', fontWeight: 800 }}>8</span>
               </span>
-              <button onClick={() => setMenuOpen(false)} style={{ color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer' }}>
-                <X size={20} />
-              </button>
+              <button onClick={() => setMenuOpen(false)} style={{ color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <div className="flex flex-col gap-1 flex-1">
-              {NAV_LINKS.map((link, i) => (
-                <motion.button
-                  key={link.label}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  onClick={() => scrollTo(link.href)}
-                  style={{
-                    fontFamily: 'var(--font-barlow)',
-                    fontWeight: 700,
-                    fontSize: '2rem',
-                    letterSpacing: '-0.01em',
-                    color: 'white',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    padding: '0.45rem 0',
-                    lineHeight: 1.1,
-                    transition: 'color 0.15s',
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.color = '#b8f224'}
-                  onMouseLeave={e => e.currentTarget.style.color = 'white'}
-                >
-                  {link.label}
-                </motion.button>
-              ))}
+              {NAV_LINKS.map((link, i) => {
+                const id = link.href.replace('#', '');
+                const isActive = active === id;
+                return (
+                  <motion.button key={link.label} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                    onClick={() => scrollTo(link.href)}
+                    style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: '2rem', letterSpacing: '-0.01em', color: isActive ? '#b8f224' : 'white', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: '0.45rem 0', lineHeight: 1.1, transition: 'color 0.15s' }}
+                    onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = '#b8f224'; }}
+                    onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'white'; }}>
+                    {link.label}
+                  </motion.button>
+                );
+              })}
             </div>
-            <button
-              onClick={() => { setMenuOpen(false); setModalOpen(true); }}
-              className="btn-lime w-full justify-center mt-8"
-              style={{ borderRadius: 12, padding: '0.875rem' }}
-            >
-              <span>We&apos;re Hiring</span>
-              <ArrowUpRight size={15} />
-            </button>
+            <div className="mt-8 space-y-3">
+              <button onClick={() => { setMenuOpen(false); setModalOpen(true); }} className="btn-lime w-full justify-center" style={{ borderRadius: 12, padding: '0.875rem' }}>
+                <span>We&apos;re Hiring</span><ArrowUpRight size={15} />
+              </button>
+              <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.72rem', color: 'rgba(255,255,255,0.2)', textAlign: 'center' }}>Karachi, Pakistan · On-Site · Published Salaries</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
