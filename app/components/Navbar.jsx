@@ -4,13 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
 import ApplyModal from './ApplyModal';
 
+// Nav order matches page scroll order exactly
 const NAV_LINKS = [
   { label: 'Manifesto', href: '#manifesto' },
   { label: 'Culture', href: '#culture' },
   { label: 'Life', href: '#life' },
-  { label: 'Services', href: '#services' },
   { label: 'Careers', href: '#careers' },
   { label: 'Salary Pledge', href: '#salary-pledge' },
+  { label: 'Services', href: '#services' },
 ];
 
 export default function Navbar() {
@@ -22,31 +23,23 @@ export default function Navbar() {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
-
-      // Scroll spy
       const sections = NAV_LINKS.map(l => l.href.replace('#', ''));
       for (let i = sections.length - 1; i >= 0; i--) {
         const el = document.getElementById(sections[i]);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 120) {
-            setActive(sections[i]);
-            break;
-          }
+        if (el && el.getBoundingClientRect().top <= 120) {
+          setActive(sections[i]);
+          return;
         }
       }
+      setActive('');
     };
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const scrollTo = (href) => {
-    const id = href.replace('#', '');
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    const el = document.getElementById(href.replace('#', ''));
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setMenuOpen(false);
   };
 
@@ -59,10 +52,10 @@ export default function Navbar() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-8"
         style={{
           height: 56,
-          background: scrolled ? 'rgba(8,8,8,0.92)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(16px)' : 'none',
+          background: scrolled ? 'rgba(8,8,8,0.93)' : 'transparent',
+          backdropFilter: scrolled ? 'blur(18px)' : 'none',
           borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
-          transition: 'background 0.3s, backdrop-filter 0.3s, border-color 0.3s',
+          transition: 'background 0.3s, backdrop-filter 0.3s',
         }}
       >
         {/* Logo */}
@@ -71,7 +64,7 @@ export default function Navbar() {
           style={{
             fontFamily: 'var(--font-jost)',
             fontWeight: 700,
-            fontSize: '1.1rem',
+            fontSize: '1.05rem',
             letterSpacing: '-0.02em',
             color: 'white',
             background: 'none',
@@ -79,14 +72,18 @@ export default function Navbar() {
             cursor: 'pointer',
             padding: 0,
             lineHeight: 1,
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.08em',
           }}
           aria-label="Feature8 home"
         >
-          Feature<span style={{ color: '#b8f224', fontSize: '0.85em', verticalAlign: 'super', lineHeight: 0 }}>8</span>
+          <span>Feature</span>
+          <span style={{ color: '#b8f224', fontSize: '0.72em', fontWeight: 800, lineHeight: 1, marginTop: '0.05em' }}>8</span>
         </button>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-0">
+        <div className="hidden md:flex items-center">
           {NAV_LINKS.map(link => {
             const id = link.href.replace('#', '');
             const isActive = active === id;
@@ -97,31 +94,31 @@ export default function Navbar() {
                 style={{
                   fontFamily: 'var(--font-jost)',
                   fontWeight: 600,
-                  fontSize: '0.7rem',
+                  fontSize: '0.68rem',
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  padding: '0.5rem 0.85rem',
+                  padding: '0.5rem 0.8rem',
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: isActive ? '#b8f224' : 'rgba(255,255,255,0.55)',
+                  color: isActive ? '#b8f224' : 'rgba(255,255,255,0.5)',
                   transition: 'color 0.2s',
                   position: 'relative',
                 }}
                 onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = 'rgba(255,255,255,0.9)'; }}
-                onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'rgba(255,255,255,0.55)'; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
               >
                 {link.label}
                 {isActive && (
                   <motion.span
-                    layoutId="nav-indicator"
+                    layoutId="nav-dot"
                     style={{
                       position: 'absolute',
-                      bottom: 2,
+                      bottom: 3,
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      width: 4,
-                      height: 4,
+                      width: 3,
+                      height: 3,
                       borderRadius: '50%',
                       background: '#b8f224',
                       display: 'block',
@@ -133,22 +130,16 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* CTA + Hamburger */}
+        {/* CTA + hamburger */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setModalOpen(true)}
-            className="btn-lime hidden sm:inline-flex"
-          >
+          <button onClick={() => setModalOpen(true)} className="btn-lime hidden sm:inline-flex">
             <span>We&apos;re Hiring</span>
             <ArrowUpRight size={13} />
           </button>
-
-          {/* Mobile hamburger */}
           <button
             className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg"
             style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}
             onClick={() => setMenuOpen(v => !v)}
-            aria-label="Toggle menu"
           >
             {menuOpen ? <X size={16} /> : <Menu size={16} />}
           </button>
@@ -166,8 +157,9 @@ export default function Navbar() {
             transition={{ duration: 0.22 }}
           >
             <div className="flex items-center justify-between mb-10">
-              <span style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '1.1rem' }}>
-                Feature<span style={{ color: '#b8f224', fontSize: '0.85em', verticalAlign: 'super' }}>8</span>
+              <span style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '1.05rem', display: 'flex', alignItems: 'flex-start', gap: '0.08em' }}>
+                <span>Feature</span>
+                <span style={{ color: '#b8f224', fontSize: '0.72em', fontWeight: 800 }}>8</span>
               </span>
               <button onClick={() => setMenuOpen(false)} style={{ color: 'rgba(255,255,255,0.5)', background: 'none', border: 'none', cursor: 'pointer' }}>
                 <X size={20} />
@@ -191,7 +183,7 @@ export default function Navbar() {
                     border: 'none',
                     cursor: 'pointer',
                     textAlign: 'left',
-                    padding: '0.5rem 0',
+                    padding: '0.45rem 0',
                     lineHeight: 1.1,
                     transition: 'color 0.15s',
                   }}
@@ -202,16 +194,14 @@ export default function Navbar() {
                 </motion.button>
               ))}
             </div>
-            <div className="mt-8">
-              <button
-                onClick={() => { setMenuOpen(false); setModalOpen(true); }}
-                className="btn-lime w-full justify-center"
-                style={{ borderRadius: 12, padding: '0.875rem' }}
-              >
-                <span>We&apos;re Hiring</span>
-                <ArrowUpRight size={15} />
-              </button>
-            </div>
+            <button
+              onClick={() => { setMenuOpen(false); setModalOpen(true); }}
+              className="btn-lime w-full justify-center mt-8"
+              style={{ borderRadius: 12, padding: '0.875rem' }}
+            >
+              <span>We&apos;re Hiring</span>
+              <ArrowUpRight size={15} />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
