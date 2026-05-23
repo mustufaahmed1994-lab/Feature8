@@ -1,54 +1,145 @@
-'use client'
-import { motion } from 'framer-motion'
+'use client';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import ParticleCanvas from './ParticleCanvas';
 
-const meta = [
-  { label: 'INDUSTRY', value: 'TECH · INFO · MEDIA' },
-  { label: 'BASE', value: 'KARACHI, PAKISTAN' },
-  { label: 'STATUS', value: 'HIRING NOW' },
-]
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+};
+
+const STATS = [
+  { label: 'Industry', value: 'TECH · INFO · MEDIA' },
+  { label: 'Base', value: 'KARACHI, PAKISTAN' },
+  { label: 'Status', value: 'HIRING NOW' },
+];
 
 export default function Hero() {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handle = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handle, { passive: true });
+    return () => window.removeEventListener('scroll', handle);
+  }, []);
+
+  const parallax = scrollY * 0.15;
+
   return (
-    <section className="relative min-h-screen flex flex-col justify-center items-center text-center px-6 hero-gradient">
+    <section
+      className="relative flex flex-col justify-end overflow-hidden"
+      style={{ minHeight: '100svh', paddingBottom: '5rem' }}
+    >
+      {/* Particle bg */}
+      <div className="absolute inset-0" style={{ transform: `translateY(${parallax}px)` }}>
+        <ParticleCanvas />
+      </div>
+
+      {/* Gradient overlay at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, transparent, #080808)' }} />
+
+      {/* Left vertical label */}
       <motion.div
-        initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        className="absolute top-20 left-6 text-[10px] tracking-[0.25em] uppercase text-cream/30">
-        KARACHI, PAKISTAN · EST. 2025
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+        className="absolute left-6 top-1/2 hidden lg:flex items-center gap-2"
+        style={{ transform: 'translateY(-50%) rotate(-90deg)', transformOrigin: 'center', whiteSpace: 'nowrap' }}
+      >
+        <span style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)' }}>
+          KARACHI, PAKISTAN · EST. 2025
+        </span>
       </motion.div>
+
+      <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-screen-2xl mx-auto w-full">
+        <motion.div variants={container} initial="hidden" animate="show">
+          {/* Big headline */}
+          <motion.div variants={item} style={{ overflow: 'hidden' }}>
+            <h1
+              style={{
+                fontFamily: 'var(--font-jost)',
+                fontWeight: 700,
+                fontSize: 'clamp(3.5rem, 10vw, 9rem)',
+                lineHeight: 1,
+                letterSpacing: '-0.03em',
+                color: '#f0ede4',
+                marginBottom: '1.25rem',
+              }}
+            >
+              Feature<sup style={{ color: '#b8f224', fontSize: '0.45em', verticalAlign: 'super', lineHeight: 0, fontWeight: 800 }}>8</sup>
+            </h1>
+          </motion.div>
+
+          {/* Tagline */}
+          <motion.p
+            variants={item}
+            style={{
+              fontFamily: 'var(--font-inter)',
+              fontSize: 'clamp(1rem, 2vw, 1.35rem)',
+              fontWeight: 400,
+              color: 'rgba(255,255,255,0.55)',
+              letterSpacing: '0.01em',
+              marginBottom: '3.5rem',
+              maxWidth: 480,
+            }}
+          >
+            Work Worth Waking Up For.
+          </motion.p>
+
+          {/* Divider */}
+          <motion.div variants={item} className="divider mb-7" style={{ maxWidth: 480 }} />
+
+          {/* Stats row */}
+          <motion.div variants={item} className="flex flex-wrap gap-8 md:gap-12">
+            {STATS.map(stat => (
+              <div key={stat.label}>
+                <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: '0.35rem' }}>
+                  {stat.label}
+                </p>
+                <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.85)' }}>
+                  {stat.value}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.8 }}
+          className="absolute bottom-0 right-8 hidden md:flex items-center gap-3"
+          style={{ paddingBottom: '1.5rem' }}
+        >
+          <span style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)' }}>
+            SCROLL
+          </span>
+          <div style={{ width: 40, height: 1, background: 'rgba(255,255,255,0.15)' }} />
+        </motion.div>
+      </div>
+
+      {/* Scroll line - centered */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-        className="mb-6">
-        <h1 className="font-display font-extrabold text-[clamp(5rem,18vw,16rem)] leading-none tracking-tighter text-cream">
-          Feature<span className="text-lime-400">⁸</span>
-        </h1>
-      </motion.div>
-      <motion.p
-        initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.4 }}
-        className="font-sans text-[clamp(1.1rem,2.5vw,1.8rem)] text-cream/60 tracking-wide mb-12">
-        Work Worth Waking Up For.
-      </motion.p>
-      <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.7 }}
-        className="flex flex-wrap justify-center gap-8 border-t border-white/10 pt-8">
-        {meta.map(m => (
-          <div key={m.label} className="text-center">
-            <div className="text-[9px] tracking-[0.2em] uppercase text-cream/30 mb-1">{m.label}</div>
-            <div className="text-xs tracking-[0.1em] text-cream/70">{m.value}</div>
-          </div>
-        ))}
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 1.1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-        <span className="text-[9px] tracking-[0.25em] uppercase text-cream/20">SCROLL</span>
-        <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-          className="w-px h-8 bg-gradient-to-b from-lime-400/60 to-transparent" />
+        initial={{ opacity: 0, scaleY: 0 }}
+        animate={{ opacity: 1, scaleY: 1 }}
+        transition={{ delay: 1.8, duration: 1, ease: 'easeOut' }}
+        className="absolute bottom-0 left-1/2 flex flex-col items-center gap-1 pb-4 md:hidden"
+        style={{ transform: 'translateX(-50%)', transformOrigin: 'bottom' }}
+      >
+        <span style={{ fontFamily: 'var(--font-jost)', fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)' }}>SCROLL</span>
+        <motion.div
+          animate={{ y: [0, 6, 0] }}
+          transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+          style={{ width: 1, height: 40, background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)' }}
+        />
       </motion.div>
     </section>
-  )
+  );
 }
