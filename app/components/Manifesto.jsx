@@ -1,91 +1,137 @@
-'use client'
-import { useState } from 'react'
+'use client';
+import { useState, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { Plus, Minus } from 'lucide-react';
 
-const items = [
+const ITEMS = [
   {
-    num: "01", tag: "On Pakistan's Talent",
-    pull: "The talent isn't the problem. It never was.",
-    paras: [
-      "Pakistan produces engineers, designers, strategists, and operators who compete with anyone in the world. IBA, NED, FAST. Thousands of graduates every year who are sharp, hungry, and ready. The raw material exists. It has always existed.",
-      "The problem is what happens after. The software house that runs on billing hours to clients in Ohio. The manager who thinks 11pm messages are a sign of dedication. The appraisal cycle that happens once a year, says keep it up, and offers a 5% raise against 25% inflation.",
-      "Over 760,000 Pakistanis left for work abroad in 2025. Not because they were disloyal. Because they were rational. You cannot ask someone to be loyal to a system that isn't loyal to them.",
-    ],
+    num: '01',
+    title: 'The Problem With Pakistan’s Job Market',
+    body: "Pakistan loses hundreds of thousands of skilled workers every year. Not because the talent isn’t here. Because the workplaces aren’t. Unclear expectations, unpublished salaries, performative culture, and management that confuses hours with output. Feature8 was built as an answer to that.",
   },
   {
-    num: "02", tag: "On the Software House Model",
-    pull: "The body-shop model made money. It just didn't make careers.",
-    paras: [
-      "The traditional Pakistani software house works like this. You hire junior developers. You bill them to clients at a markup. You keep the spread. The developer learns, gets good, and leaves for somewhere that pays more. You hire another junior developer. Repeat.",
-      "This is not a talent problem. This is a business model problem. When the incentive is billable hours, not product quality, everything downstream suffers. The work is shallow. The growth is stunted. The turnover is constant.",
-      "We are not a software house. We build our own products. Our incentives are aligned with quality and output, not with keeping someone billable.",
-    ],
+    num: '02',
+    title: 'What We Actually Do',
+    body: "We’re a technology, information, and media company. We build digital products, run content operations, and work with businesses to grow their online presence. Our three verticals—Tech, Info, and Media—aren’t silos. They feed each other. A tool we build internally becomes a product. A content insight shapes a client strategy.",
   },
   {
-    num: "03", tag: "On Transparency",
-    pull: "Opacity is a management tool. We are done with it.",
-    paras: [
-      "Salary opacity is how you suppress wages and gaslight people into accepting less than they are worth. Our salary ranges are on the website. Go look.",
-      "That means writing down career paths. Not as a document that lives on a shared drive nobody reads. As a real conversation, tracked, reviewed, and updated. If you are not growing here, that is partly on you and partly on us. We take our part seriously.",
-    ],
+    num: '03',
+    title: 'How We Run the Place',
+    body: "We don’t do diplomatic vagueness. Say what you mean. We don’t do title politics. Your contribution matters more than your seniority. We don’t do busywork. If a meeting can be a message, it’s a message. We do expect excellence. Not performative effort—actual results.",
   },
   {
-    num: "04", tag: "On Karachi",
-    pull: "We're based in Karachi. Not in spite of it. Because of it.",
-    paras: [
-      "Karachi has solved problems that no business school curriculum covers. Infrastructure failures, grid collapses, internet shutdowns, economic whiplash. The people who built careers here did it through conditions that would have levelled most organisations elsewhere.",
-      "That resilience is not a consolation prize. It is a competitive advantage. Feature8 is a Karachi company because the best version of this company could only come from here.",
-    ],
+    num: '04',
+    title: 'What You Can Expect From Us',
+    body: "Published salary ranges before you apply. A real explanation if you’re not selected. Feedback that’s honest, not HR-sanitised. A manager who knows what you’re working on. The ability to raise a problem without it becoming a political event.",
   },
   {
-    num: "05", tag: "The Commitment",
-    pull: "Here is what we commit to. In writing. On the internet.",
-    paras: [
-      "We will pay you fairly, review salaries annually against inflation, and never defend an offer with that is market rate when we know it isn't. We will tell you exactly what growth looks like before you join, not after you ask. We will give you real work that ships, not busywork that fills a timesheet.",
-      "And if we fail to do any of this, we expect you to call it out. That is not just permitted here. It is required. A company that cannot handle honest feedback from its own people has no business asking for trust from anyone.",
-    ],
+    num: '05',
+    title: 'Who This Is For',
+    body: "People who are good at what they do and tired of pretending the current state of things is fine. People who want to be paid what the work is actually worth. People who would rather build something real than manage the appearance of building something. If that’s you, we’d like to meet you.",
   },
-]
+];
+
+function AccordionItem({ item, isOpen, onToggle, index, inView }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.45, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+    >
+      <button
+        className="accordion-trigger"
+        onClick={onToggle}
+        style={{ padding: '1.4rem 0' }}
+      >
+        <div className="flex items-center gap-5">
+          <span style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.12em', color: isOpen ? '#b8f224' : 'rgba(255,255,255,0.25)', minWidth: 24, transition: 'color 0.2s' }}>
+            {item.num}
+          </span>
+          <span style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)', color: isOpen ? 'white' : 'rgba(255,255,255,0.7)', transition: 'color 0.2s', letterSpacing: '-0.01em' }}>
+            {item.title}
+          </span>
+        </div>
+        <motion.div
+          animate={{ rotate: isOpen ? 0 : 0 }}
+          className="flex-shrink-0 ml-4 w-8 h-8 rounded-full flex items-center justify-center"
+          style={{
+            background: isOpen ? 'rgba(184,242,36,0.15)' : 'rgba(255,255,255,0.05)',
+            border: isOpen ? '1px solid rgba(184,242,36,0.3)' : '1px solid rgba(255,255,255,0.1)',
+            color: isOpen ? '#b8f224' : 'rgba(255,255,255,0.4)',
+            transition: 'all 0.2s',
+            flexShrink: 0,
+          }}
+        >
+          {isOpen ? <Minus size={13} /> : <Plus size={13} />}
+        </motion.div>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ paddingLeft: 'calc(24px + 1.25rem)', paddingBottom: '1.5rem', paddingRight: '3rem' }}>
+              <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.8 }}>
+                {item.body}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
 
 export default function Manifesto() {
-  const [open, setOpen] = useState(null)
+  const [openIndex, setOpenIndex] = useState(0);
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
   return (
-    <div className="relative z-10 py-24 px-6 border-t border-white/5">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-16 reveal">
-          <div className="section-label">THE FEATURE8 MANIFESTO</div>
-          <h2 className="section-title text-[clamp(3rem,8vw,8rem)]">This Is What<br />We Believe.</h2>
-          <p className="text-cream/50 mt-6 max-w-xl text-lg leading-relaxed">
-            Every decision we make comes from this document. If something on this page makes you uncomfortable, you&apos;re probably not our person. That&apos;s fine. We&apos;d rather you know now.
-          </p>
-        </div>
-        <div className="space-y-0">
-          {items.map((item, i) => (
-            <div key={i} className="mf-section">
-              <button
-                onClick={() => setOpen(open === i ? null : i)}
-                className="w-full flex items-start justify-between py-8 gap-6 text-left group">
-                <div className="flex items-start gap-6">
-                  <span className="font-display font-extrabold text-lg text-lime-400 w-8 flex-shrink-0">{item.num}</span>
-                  <div>
-                    <div className="font-display font-extrabold text-[clamp(1.5rem,3vw,2.5rem)] text-cream group-hover:text-lime-400 transition-colors leading-tight">
-                      {item.tag}
-                    </div>
-                    <p className="text-cream/40 text-lg mt-2 font-sans italic">{item.pull}</p>
-                  </div>
-                </div>
-                <span className={`text-lime-400 text-2xl flex-shrink-0 mt-1 transition-transform duration-200 ${open === i ? 'rotate-45' : ''}`}>+</span>
-              </button>
-              {open === i && (
-                <div className="pb-8 pl-14 space-y-4">
-                  {item.paras.map((p, j) => (
-                    <p key={j} className="text-cream/60 text-base leading-relaxed max-w-3xl">{p}</p>
-                  ))}
-                </div>
-              )}
-            </div>
+    <section className="section-pad" style={{ background: '#080808' }}>
+      <div className="max-w-screen-xl mx-auto px-6 md:px-12">
+        <motion.div
+          ref={ref}
+          initial={{ opacity: 0, y: 25 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+          className="mb-12"
+        >
+          <p className="label mb-3">Our Manifesto</p>
+          <h2
+            style={{
+              fontFamily: 'var(--font-barlow)',
+              fontWeight: 700,
+              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+              lineHeight: 1.05,
+              color: 'white',
+              maxWidth: 600,
+            }}
+          >
+            What Feature8 Actually Is.
+          </h2>
+        </motion.div>
+
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          {ITEMS.map((item, i) => (
+            <AccordionItem
+              key={i}
+              item={item}
+              index={i}
+              inView={inView}
+              isOpen={openIndex === i}
+              onToggle={() => setOpenIndex(openIndex === i ? -1 : i)}
+            />
           ))}
         </div>
       </div>
-    </div>
-  )
+    </section>
+  );
 }
