@@ -1,115 +1,206 @@
-'use client'
-import { useState } from 'react'
+'use client';
+import { useState, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { ArrowUpRight, MapPin, Briefcase, ChevronRight, Search } from 'lucide-react';
+import ApplyModal from './ApplyModal';
 
-const steps = [
-  { num:"01", title:"Apply", desc:"Send your CV and a short note about why this role. No cover letter template. Just tell us what you care about.", time:"Day 1 to 3" },
-  { num:"02", title:"Intro Call", desc:"30 minutes with a team lead. We will walk you through the role. You ask the questions you actually need answered.", time:"30 mins · Day 5 to 7" },
-  { num:"03", title:"Work Sample", desc:"A short, relevant task. Not a free project. 2 to 3 hours. We review seriously and give feedback regardless of outcome.", time:"2 to 3 hrs · Day 10 to 14" },
-  { num:"04", title:"Decision", desc:"A final conversation. Offer or honest feedback. Timeline from application to offer: 2 to 3 weeks maximum.", time:"Day 14 to 21" },
-]
+const JOBS = [
+  {
+    id: 'project-manager',
+    title: 'Project Manager',
+    dept: 'Operations',
+    type: 'On-Site',
+    location: 'Karachi',
+    salary: null,
+    salaryLabel: 'See Salary Pledge',
+    tags: ['Operations'],
+    description: 'Own the delivery. Keep teams aligned, timelines honest, and clients confident. You bridge strategy and execution.',
+  },
+  {
+    id: 'acquisition-specialist',
+    title: 'Acquisition Specialist',
+    dept: 'Sales Team',
+    type: 'On-Site',
+    location: 'Karachi',
+    salary: 'PKR 80K–100K + Commission',
+    tags: ['Sales'],
+    description: 'Find the right clients, start the right conversations. You’re the first impression Feature8 makes on the market.',
+  },
+  {
+    id: 'retention-specialist',
+    title: 'Retention Specialist',
+    dept: 'Sales Team',
+    type: 'On-Site',
+    location: 'Karachi',
+    salary: 'PKR 80K–100K + Commission',
+    tags: ['Sales'],
+    description: 'Keep clients coming back. Build relationships that compound. Turn results into long-term partnerships.',
+  },
+  {
+    id: 'devops-engineer',
+    title: 'DevOps Engineer',
+    dept: 'Tech',
+    type: 'On-Site',
+    location: 'Karachi',
+    salary: null,
+    salaryLabel: 'See Salary Pledge',
+    tags: ['Tech'],
+    description: 'Build and maintain the infrastructure that keeps everything running. CI/CD, cloud, reliability — this is your domain.',
+  },
+];
 
-const roles = [
-  { dept: "Operations", deptSlug: "operations", title: "Project Manager", location: "Karachi", type: "On-Site", employment: "Full-Time", desc: "You guide projects from conception to completion. Own the lifecycle. If it ships on time and to spec, that is on you.", salary: "See Salary Pledge" },
-  { dept: "Sales Team", deptSlug: "sales", title: "Acquisition Specialist", location: "Karachi", type: "On-Site", employment: "Full-Time", desc: "You convert leads into buyers. Design funnels, run outbound campaigns and optimize conversion. Revenue is the metric.", salary: "PKR 80K–100K + Commission" },
-  { dept: "Sales Team", deptSlug: "sales", title: "Retention Specialist", location: "Karachi", type: "On-Site", employment: "Full-Time", desc: "Minimize churn. Maximize loyalty. Identify at-risk clients, resolve issues, drive renewals and upsells. Retention is the compounding variable.", salary: "PKR 80K–100K + Commission" },
-  { dept: "Tech", deptSlug: "tech", title: "DevOps Engineer", location: "Karachi", type: "On-Site", employment: "Full-Time", desc: "Bridge development and operations. Automate everything, harden systems, accelerate delivery. CI/CD, infrastructure, monitoring.", salary: "See Salary Pledge" },
-]
+const FILTERS = ['All', 'Tech', 'Sales', 'Operations'];
 
-const filters = ["All", "Tech", "Design", "Product", "Sales & BD", "Operations"]
+const PROCESS = [
+  { num: '01', title: 'Apply', desc: 'Fill out the form. We read every application personally.' },
+  { num: '02', title: 'Screening', desc: 'A short call to understand your background and goals.' },
+  { num: '03', title: 'Task or Interview', desc: 'Role-specific assessment or in-depth conversation.' },
+  { num: '04', title: 'Decision', desc: 'Honest feedback either way, within a week.' },
+];
 
 export default function Careers() {
-  const [activeFilter, setActiveFilter] = useState("All")
-  const filtered = activeFilter === "All" ? roles : roles.filter(r => r.dept.toLowerCase().includes(activeFilter.toLowerCase()) || r.deptSlug.toLowerCase().includes(activeFilter.toLowerCase()))
+  const [filter, setFilter] = useState('All');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [generalModal, setGeneralModal] = useState(false);
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-80px' });
+
+  const filtered = filter === 'All' ? JOBS : JOBS.filter(j => j.tags.includes(filter));
 
   return (
-    <div className="relative z-10 py-24 px-6 border-t border-white/5">
-      <div className="max-w-7xl mx-auto space-y-24">
-        <div className="reveal">
-          <div className="section-label">OPEN ROLES</div>
-          <h2 className="section-title text-[clamp(3rem,7vw,7rem)]">Come Build<br />With Us.</h2>
-          <p className="text-cream/50 mt-6 max-w-xl text-lg leading-relaxed">
-            Four roles open right now. All on-site, all in Karachi.
-          </p>
-        </div>
+    <>
+      <section className="section-pad" style={{ background: '#080808' }}>
+        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
+          
+          {/* Header */}
+          <motion.div
+            ref={ref}
+            initial={{ opacity: 0, y: 25 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5 }}
+            className="mb-12"
+          >
+            <p className="label mb-3">Open Roles</p>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <h2 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.05, color: 'white', maxWidth: 500 }}>
+                Find Your Place at Feature8.
+              </h2>
+              <button
+                onClick={() => { setGeneralModal(true); setModalOpen(true); }}
+                className="btn-outline self-start md:self-auto"
+              >
+                <span>Submit General Application</span>
+                <ArrowUpRight size={13} />
+              </button>
+            </div>
+          </motion.div>
 
-        <div className="reveal">
-          <div className="mb-8">
-            <h3 className="font-display font-extrabold text-2xl text-cream mb-2">How Hiring Works</h3>
-            <p className="text-cream/40 text-sm">No mystery. No six rounds.</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {steps.map(s => (
-              <div key={s.num} className="card-dark p-6">
-                <div className="text-lime-400 font-display font-extrabold text-3xl mb-4">Step {s.num}</div>
-                <h4 className="font-display font-extrabold text-lg text-cream mb-3">{s.title}</h4>
-                <p className="text-cream/50 text-sm leading-relaxed mb-4">{s.desc}</p>
-                <div className="text-cream/25 text-xs tracking-[0.1em]">{s.time}</div>
-              </div>
+          {/* Filter tabs */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.4, delay: 0.15 }}
+            className="flex gap-2 mb-8 flex-wrap"
+          >
+            {FILTERS.map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                style={{
+                  fontFamily: 'var(--font-jost)',
+                  fontWeight: 700,
+                  fontSize: '0.72rem',
+                  letterSpacing: '0.06em',
+                  padding: '0.45rem 1rem',
+                  borderRadius: 9999,
+                  border: filter === f ? '1px solid rgba(184,242,36,0.5)' : '1px solid rgba(255,255,255,0.1)',
+                  background: filter === f ? 'rgba(184,242,36,0.12)' : 'transparent',
+                  color: filter === f ? '#b8f224' : 'rgba(255,255,255,0.45)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {f}
+              </button>
             ))}
-          </div>
-        </div>
+          </motion.div>
 
-        <div>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-            <div>
-              <h3 className="font-display font-extrabold text-2xl text-cream">{filtered.length} Open Roles</h3>
-              <p className="text-cream/30 text-xs mt-1">Updated May 2025</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {filters.map(f => (
-                <button key={f} onClick={() => setActiveFilter(f)}
-                  className={`text-xs tracking-[0.1em] uppercase px-4 py-2 rounded-full border transition-colors duration-150 ${activeFilter === f ? 'bg-lime-400 text-dark-900 border-lime-400' : 'border-white/10 text-cream/50 hover:border-lime-400/50 hover:text-cream'}`}>
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="space-y-3">
-            {filtered.length === 0 && (
-              <div className="card-dark p-8 text-center text-cream/30">No roles in this department right now.</div>
-            )}
-            {filtered.map((role, i) => (
-              <div key={i} className="job-card card-dark p-6 md:p-8">
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-3 mb-3">
-                      <span className="text-[9px] tracking-[0.2em] uppercase text-lime-400 border border-lime-400/30 px-2 py-1 rounded-full">{role.dept}</span>
-                      <div className="flex gap-2 text-[9px] tracking-[0.15em] uppercase text-cream/30">
-                        <span>{role.location}</span>
-                        <span>{role.type}</span>
-                        <span>{role.employment}</span>
-                      </div>
+          {/* Job listings */}
+          <div className="flex flex-col gap-3 mb-16">
+            {filtered.map((job, i) => (
+              <motion.div
+                key={job.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}
+                className="card-dark p-5 md:p-6"
+                style={{ cursor: 'pointer' }}
+                onClick={() => { setGeneralModal(false); setModalOpen(true); }}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(1.1rem, 2.5vw, 1.3rem)', color: 'white', letterSpacing: '-0.01em' }}>
+                        {job.title}
+                      </h3>
                     </div>
-                    <h4 className="font-display font-extrabold text-2xl text-cream mb-3">{role.title}</h4>
-                    <p className="text-cream/50 text-sm leading-relaxed max-w-2xl">{role.desc}</p>
+                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                      <span className="tag" style={{ fontSize: '0.65rem' }}>{job.dept}</span>
+                      <span className="tag" style={{ fontSize: '0.65rem' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <MapPin size={9} style={{ opacity: 0.6 }} />{job.location}
+                        </span>
+                      </span>
+                      <span className="tag" style={{ fontSize: '0.65rem' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                          <Briefcase size={9} style={{ opacity: 0.6 }} />{job.type}
+                        </span>
+                      </span>
+                    </div>
+                    <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.83rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.65 }}>
+                      {job.description}
+                    </p>
                   </div>
-                  <div className="flex flex-col items-start md:items-end gap-3">
-                    <div className="text-xs text-cream/30">Monthly Range</div>
-                    <div className="text-cream font-semibold text-sm">{role.salary}</div>
-                    <a href={`mailto:careers@feature8.com?subject=Application: ${role.title}`}
-                      className="btn-primary text-xs py-2 px-5 mt-2">Apply ↗</a>
+                  <div className="flex flex-col items-end gap-3 flex-shrink-0">
+                    {job.salary ? (
+                      <div className="text-right">
+                        <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', marginBottom: '0.2rem' }}>Monthly</p>
+                        <p style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>{job.salary}</p>
+                      </div>
+                    ) : (
+                      <span style={{ fontFamily: 'var(--font-jost)', fontWeight: 600, fontSize: '0.75rem', color: '#b8f224' }}>{job.salaryLabel}</span>
+                    )}
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(184,242,36,0.1)', border: '1px solid rgba(184,242,36,0.2)' }}>
+                      <ChevronRight size={14} color="#b8f224" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
-          <p className="text-cream/25 text-xs mt-6">
-            All applications go to careers@feature8.com. You will get a response.
-          </p>
-        </div>
 
-        <div className="card-dark p-12 md:p-16 rounded-3xl text-center">
-          <h3 className="font-display font-extrabold text-[clamp(2rem,5vw,4rem)] text-cream mb-4">
-            We&apos;re Growing.<br />Come Anyway.
-          </h3>
-          <p className="text-cream/50 max-w-lg mx-auto mb-8 leading-relaxed">
-            If you are exceptional at something and think you belong here, send us an email. No open role needed.
-          </p>
-          <a href="mailto:careers@feature8.com?subject=General Application" className="btn-primary">
-            Send a General Application ↗
-          </a>
+          {/* Hiring process */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            <p className="label mb-6">How We Hire</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {PROCESS.map((step, i) => (
+                <div key={i} className="card-dark p-5">
+                  <span style={{ fontFamily: 'var(--font-jost)', fontWeight: 800, fontSize: '0.65rem', letterSpacing: '0.1em', color: '#b8f224', display: 'block', marginBottom: '0.75rem' }}>{step.num}</span>
+                  <h4 style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '0.95rem', color: 'white', marginBottom: '0.4rem' }}>{step.title}</h4>
+                  <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.78rem', color: 'rgba(255,255,255,0.4)', lineHeight: 1.65 }}>{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </div>
-  )
+      </section>
+
+      <ApplyModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setGeneralModal(false); }} defaultGeneral={generalModal} />
+    </>
+  );
 }
