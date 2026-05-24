@@ -33,23 +33,24 @@ function sn(xin, yin) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Ridge: fold noise around midpoints to create bright narrow peaks
-// The squaring ensures only the very top of each ridge glows bright
+// Ridge noise: fold around zero to create thin bright peaks on dark background.
+// Cubing ensures only the very sharpest ridges remain visible.
 function ridge(nx, ny) {
-  const v = sn(nx, ny)        // -1..1
-  const r = 1 - Math.abs(v)  // peak at zero-crossings
-  return r * r * r            // cube = very sharp ridges, near-zero everywhere else
+  const v = sn(nx, ny)
+  const r = 1 - Math.abs(v)
+  return r * r * r  // cubic = ultra-thin veins
 }
 
-// Render at 1/4 resolution, upscale for smooth bilinear stretch
+// Render at 1/4 resolution, scaled up for bilinear smoothing
 const DS = 4
 
+// Three caustic layers — different frequencies create the natural crossing patterns
 const LAYERS = [
   { ox:  0.00, oy:  0.00, freq: 5.5,  speed: 0.00011, w: 1.00 },
   { ox: 17.30, oy:  5.50, freq: 9.0,  speed: 0.00016, w: 0.70 },
   { ox:  8.10, oy: 23.40, freq: 14.0, speed: 0.00008, w: 0.40 },
 ]
-const W_SUM = 1.00 + 0.70 + 0.40
+const W_SUM = 2.10  // 1.00 + 0.70 + 0.40
 
 export default function ParticleCanvas() {
   const canvasRef = useRef(null)
@@ -61,15 +62,17 @@ export default function ParticleCanvas() {
     let animId, W = 0, H = 0, t = 0
     let tMx = 0.72, tMy = 0.22, smx = 0.72, smy = 0.22
 
-    // Off-screen low-res buffer
-    const lo = document.createElement('canvas')
+    // Bloom buffer: separate canvas for glow so we can blur without bleeding into black
+    const lo   = document.createElement('canvas')
     const lctx = lo.getContext('2d', { alpha: true, willReadFrequently: true })
+    const glow   = document.createElement('canvas')
+    const glowCtx = glow.getContext('2d', { alpha: true })
 
     const resize = () => {
       W = canvas.width = window.innerWidth
       H = canvas.height = window.innerHeight
-      lo.width  = Math.ceil(W / DS)
-      lo.height = Math.ceil(H / DS)
+      lo.width = glow.width = Math.ceil(W / DS)
+      lo.height = glow.height = Math.ceil(H / DS)
     }
     resize()
     window.addEventListener('resize', resize, { passive: true })
@@ -87,90 +90,92 @@ export default function ParticleCanvas() {
       const img = lctx.createImageData(lW, lH)
       const d = img.data
 
-      // Focal centre — upper-right quadrant, gently mouse-reactive
+      // Focal centre — upper-right, gently mouse-reactive
       const fcx = lW * (0.70 + smx * 0.05)
       const fcy = lH * (0.18 + smy * 0.05)
       const mwx = (smx - 0.5) * 0.14
       const mwy = (smy - 0.5) * 0.10
 
-      // Render only right 50%, top 78%
-      const xStart = Math.floor(lW * 0.42)
-      const yEnd   = Math.floor(lH * 0.78)
+      // Active region: right 50%, top 76%
+      const xStart = Math.floor(lW * 0.44)
+      const yEnd   = Math.floor(lH * 0.76)
 
       for (let py = 0; py < yEnd; py++) {
         const fy = py / lH
         for (let px = xStart; px < lW; px++) {
           const fx = px / lW
 
-          // Elliptical radial falloff from focal centre
-          const ddx = (px - fcx) / (lW * 0.50)
-          const ddy = (py - fcy) / (lH * 0.50)
+          // Elliptical radial falloff
+          const ddx = (px - fcx) / (lW * 0.48)
+          const ddy = (py - fcy) / (lH * 0.48)
           const radFade = Math.max(0, 1 - (ddx*ddx + ddy*ddy))
           if (radFade < 0.01) continue
 
           // Edge feather
-          const eL = Math.min(1, (fx - 0.42) / 0.07)
+          const eL = Math.min(1, (fx - 0.44) / 0.06)
           const eR = Math.min(1, (1.0  - fx) / 0.05)
           const eT = Math.min(1, fy / 0.05)
-          const eB = Math.min(1, (0.78 - fy) / 0.09)
+          const eB = Math.min(1, (0.76 - fy) / 0.08)
           const eFade = Math.min(eL, eR, eT, eB)
           if (eFade <= 0) continue
 
-          const mask = Math.pow(radFade, 1.6) * eFade
+          const mask = Math.pow(radFade, 1.5) * eFade
 
-          // Accumulate ridge noise
+          // Accumulate ridge noise from all layers
           let bright = 0
           for (let li = 0; li < LAYERS.length; li++) {
             const L = LAYERS[li]
             const tm = t * L.speed
-            const nx = fx * L.freq + L.ox + tm       + mwx
-            const ny = fy * L.freq + L.oy + tm * 0.68 + mwy
-            bright += ridge(nx, ny) * L.w
+            bright += ridge(
+              fx * L.freq + L.ox + tm       + mwx,
+              fy * L.freq + L.oy + tm * 0.68 + mwy
+            ) * L.w
           }
 
-          // Normalize and apply ultra-sharp curve
-          // pow(norm, 2.8): 95%+ of pixels near-zero → true black gaps
-          const norm    = bright / W_SUM
-          const sharp   = Math.pow(norm, 2.8)
-          if (sharp < 0.006) continue
+          // Normalize + very aggressive sharpening curve
+          // pow 3.2: dark pixels collapse to ~0, only true ridge peaks survive
+          const norm  = bright / W_SUM
+          const sharp = Math.pow(norm, 3.2)
+          if (sharp < 0.005) continue
 
-          const alpha = sharp * mask
-          if (alpha < 0.006) continue
+          const a = sharp * mask
+          if (a < 0.005) continue
 
-          // Pure lime-white at peaks, falls to transparent (not green)
-          // High R+G with low B = clean acid lime
-          const r = Math.round(210 + sharp * 45)
-          const g = Math.round(235 + sharp * 20)
-          const b = Math.round(30  + sharp * 10)
-          const a = Math.round(alpha * 200)
+          // Bright lime-white at peaks; alpha encodes both intensity and position
+          // R=255 G=255 B=60 at peak → pure lime-white highlight
+          const r = Math.round(200 + sharp * 55)
+          const g = Math.round(230 + sharp * 25)
+          const b = Math.round(20  + sharp * 40)
 
+          // Two values: base sharp layer (full alpha) + a dimmer glow layer
           const idx = (py * lW + px) * 4
           d[idx]   = r
           d[idx+1] = g
           d[idx+2] = b
-          d[idx+3] = a
+          d[idx+3] = Math.round(a * 210)
         }
       }
       lctx.putImageData(img, 0, 0)
 
-      // ── Composite to main canvas ─────────────────────────────────────────
+      // ── Composite ──────────────────────────────────────────────────────────
       ctx.clearRect(0, 0, W, H)
 
-      // Wide soft glow — very low opacity to avoid green haze
-      ctx.globalAlpha = 0.08
-      ctx.filter = 'blur(8px)'
-      ctx.drawImage(lo, 0, 0, W, H)
-      ctx.filter = 'none'
-
-      // Tight bloom
-      ctx.globalAlpha = 0.20
-      ctx.filter = 'blur(2px)'
-      ctx.drawImage(lo, 0, 0, W, H)
-      ctx.filter = 'none'
-
-      // Crisp sharp veins at full opacity
+      // 1) Render crisp sharp vein layer at full size
       ctx.globalAlpha = 1
       ctx.drawImage(lo, 0, 0, W, H)
+
+      // 2) Tight glow: upscale the lo buffer with a CSS blur filter applied
+      //    by drawing to an intermediate canvas first, then compositing with
+      //    low alpha. This keeps blur strictly inside the vein region.
+      glowCtx.clearRect(0, 0, lo.width, lo.height)
+      glowCtx.globalAlpha = 1
+      glowCtx.drawImage(lo, 0, 0)
+
+      ctx.globalAlpha = 0.30
+      ctx.filter = 'blur(3px)'
+      ctx.drawImage(glow, 0, 0, W, H)
+      ctx.filter = 'none'
+      ctx.globalAlpha = 1
 
       animId = requestAnimationFrame(draw)
     }
