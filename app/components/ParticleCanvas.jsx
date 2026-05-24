@@ -34,15 +34,14 @@ function sn(xin, yin) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Ridge noise — cubic sharpening creates ultra-thin bright peaks with true-black gaps.
-// The glow is encoded directly in the pixel alpha channel so no blur spreading needed.
 function ridge(nx, ny) {
   const v = sn(nx, ny)
   const r = 1 - Math.abs(v)
-  return r * r * r
+  return r * r * r  // cubic = ultra-thin veins, true black elsewhere
 }
 
-// DS=4: render at 1/4 resolution, bilinear upscale provides natural sub-pixel softness
-const DS = 4
+// DS=3: render at 1/3 resolution for sharper veins + less bilinear blur spread
+const DS = 3
 
 const LAYERS = [
   { ox:  0.00, oy:  0.00, freq: 5.5,  speed: 0.00011, w: 1.00 },
@@ -129,7 +128,6 @@ export default function ParticleCanvas() {
           }
 
           // Ultra-aggressive sharpening: pow 3.5 = only razor-thin peaks survive
-          // This creates the "true black" gaps between veins with no ambient glow
           const norm  = bright / W_SUM
           const sharp = Math.pow(norm, 3.5)
           if (sharp < 0.004) continue
@@ -137,14 +135,14 @@ export default function ParticleCanvas() {
           const a = sharp * mask
           if (a < 0.004) continue
 
-          // Encode glow INLINE: write two alpha levels per pixel.
-          // Primary pixel: full brightness lime-white
-          // This makes the pixel itself bright at peak, transparent elsewhere.
-          // The DS=4 bilinear upscale creates the natural soft halo for free.
-          const r = Math.round(195 + sharp * 60)
-          const g = Math.round(228 + sharp * 27)
-          const b = Math.round(20  + sharp * 40)
-          const a8 = Math.round(a * 220)
+          // KEY FIX: Pure bright lime-white at peak.
+          // High R + high G + near-zero B = clean acid lime, not olive.
+          // When bilinear interpolation blends these pixels into black neighbors,
+          // the result is a clean bright-lime halo, not a murky green cloud.
+          const r = Math.round(184 + sharp * 71)   // 184→255 range
+          const g = Math.round(242 + sharp * 13)   // 242→255 range (near-white at peak)
+          const b = Math.round(0   + sharp * 36)   // 0→36 range (minimal blue)
+          const a8 = Math.round(a * 200)
 
           const idx = (py * lW + px) * 4
           d[idx]   = r
@@ -155,11 +153,10 @@ export default function ParticleCanvas() {
       }
       lctx.putImageData(img, 0, 0)
 
-      // ── Composite — NO blur filter to avoid olive-green haze ──────────────
+      // No blur filter — DS=3 bilinear upscale provides natural softness
+      // without spreading olive-green haze into the black background
       ctx.clearRect(0, 0, W, H)
       ctx.globalAlpha = 1
-      // The DS=4 upscale from lo -> main canvas creates bilinear smoothing
-      // which naturally produces a soft halo effect without color bleeding
       ctx.drawImage(lo, 0, 0, W, H)
 
       animId = requestAnimationFrame(draw)
