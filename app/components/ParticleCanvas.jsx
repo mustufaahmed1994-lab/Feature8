@@ -33,15 +33,14 @@ function sn(xin, yin) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Ridge noise: fold around zero → thin bright peaks, true black between them
+// Ridge noise: fold → thin bright peaks, near-zero elsewhere
 function ridge(nx, ny) {
   const v = sn(nx, ny)
   const r = 1 - Math.abs(v)
   return r * r * r
 }
 
-// DS=3: 1/3 resolution offscreen buffer
-const DS = 3
+const DS = 3  // 1/3 resolution offscreen buffer
 
 const LAYERS = [
   { ox:  0.00, oy:  0.00, freq: 5.5,  speed: 0.00011, w: 1.00 },
@@ -57,16 +56,16 @@ export default function ParticleCanvas() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    // IMPORTANT: opaque canvas so screen blend works correctly.
-    // We fill the canvas background to pure black (#080808),
-    // then draw bright lime veins. Screen blend with the page makes
-    // only the bright veins visible — dark areas disappear into page bg.
+    // Opaque canvas + mix-blend-mode screen:
+    // - Pure black on canvas = invisible (screen(0,x) = x, so black passes through)
+    // - Bright lime on canvas = vivid accent over any dark background
+    // - Bilinear interpolation of lime pixels into black = lime-tinted halo, not olive
     const ctx = canvas.getContext('2d', { alpha: false })
     let animId, W = 0, H = 0, t = 0
     let tMx = 0.72, tMy = 0.22, smx = 0.72, smy = 0.22
 
     const lo   = document.createElement('canvas')
-    const lctx = lo.getContext('2d', { alpha: true, willReadFrequently: true })
+    const lctx = lo.getContext('2d', { alpha: false, willReadFrequently: true })
 
     const resize = () => {
       W = canvas.width = window.innerWidth
@@ -95,6 +94,8 @@ export default function ParticleCanvas() {
       const mwx = (smx - 0.5) * 0.14
       const mwy = (smy - 0.5) * 0.10
 
+      // All pixels start black (ImageData initializes to 0,0,0,255 for opaque ctx)
+      // Only paint bright pixels where veins are present
       const xStart = Math.floor(lW * 0.44)
       const yEnd   = Math.floor(lH * 0.76)
 
@@ -131,13 +132,10 @@ export default function ParticleCanvas() {
           const sharp = Math.pow(norm, 3.5)
           if (sharp < 0.005) continue
 
-          const a = sharp * mask
-          if (a < 0.005) continue
+          const lum = sharp * mask
 
-          // Render as opaque bright lime RGB (no alpha).
-          // Screen blend on canvas handles the fade — dark = invisible, bright = vivid.
-          // This completely avoids the pre-multiplied-alpha olive problem.
-          const lum = a * sharp
+          // Bright lime color — R=184 G=242 B=36 at full brightness (#b8f224)
+          // Scaled by lum so dark areas remain black (screen(black,x) = x)
           const r = Math.round(lum * 184)
           const g = Math.round(lum * 242)
           const b = Math.round(lum * 36)
@@ -146,18 +144,17 @@ export default function ParticleCanvas() {
           d[idx]   = r
           d[idx+1] = g
           d[idx+2] = b
-          d[idx+3] = 255  // fully opaque — color IS the intensity
+          d[idx+3] = 255  // opaque, color encodes intensity
         }
       }
       lctx.putImageData(img, 0, 0)
 
-      // Fill main canvas with page background color
-      ctx.fillStyle = '#080808'
+      // Black background on main canvas
+      ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, W, H)
 
-      // Screen-like additive composite: source-over still works here
-      // because our lo buffer is opaque with RGB encoding intensity.
-      ctx.globalAlpha = 1
+      // Upscale lo → main; bilinear interpolation spreads bright lime into
+      // adjacent black pixels naturally (lime halo, not olive blob)
       ctx.drawImage(lo, 0, 0, W, H)
 
       animId = requestAnimationFrame(draw)
@@ -174,7 +171,7 @@ export default function ParticleCanvas() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 w-full h-full pointer-events-none z-0"
-      style={{ mixBlendMode: 'screen', opacity: 1 }}
+      style={{ mixBlendMode: 'screen' }}
     />
   )
 }
