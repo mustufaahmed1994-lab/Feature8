@@ -1,52 +1,38 @@
 'use client'
 import { useEffect, useRef } from 'react'
 
-// ─── 2D Simplex Noise (Stefan Gustavson) ─────────────────────────────────────
-const _perm = new Uint8Array(512)
-;(function seed() {
-  const base = new Uint8Array(256)
-  for (let i = 0; i < 256; i++) base[i] = i
-  for (let i = 255; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [base[i], base[j]] = [base[j], base[i]]
-  }
-  for (let i = 0; i < 512; i++) _perm[i] = base[i & 255]
+// ─── Simplex Noise ────────────────────────────────────────────────────────────
+const _p = new Uint8Array(512)
+;(function(){
+  const b = new Uint8Array(256)
+  for (let i=0;i<256;i++) b[i]=i
+  for (let i=255;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}
+  for (let i=0;i<512;i++) _p[i]=b[i&255]
 })()
-const _F2 = 0.5 * (Math.sqrt(3) - 1), _G2 = (3 - Math.sqrt(3)) / 6
-const _g2 = [[1,1],[-1,1],[1,-1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]]
-function sn(xin, yin) {
-  const s = (xin + yin) * _F2
-  const i = Math.floor(xin + s), j = Math.floor(yin + s)
-  const t = (i + j) * _G2
-  const x0 = xin - (i - t), y0 = yin - (j - t)
-  const i1 = x0 > y0 ? 1 : 0, j1 = x0 > y0 ? 0 : 1
-  const x1 = x0 - i1 + _G2, y1 = y0 - j1 + _G2
-  const x2 = x0 - 1 + 2 * _G2, y2 = y0 - 1 + 2 * _G2
-  const ii = i & 255, jj = j & 255
-  const g0 = _g2[_perm[ii + _perm[jj]] % 8]
-  const g1 = _g2[_perm[ii + i1 + _perm[jj + j1]] % 8]
-  const g2 = _g2[_perm[ii + 1 + _perm[jj + 1]] % 8]
-  const t0 = 0.5 - x0*x0 - y0*y0, n0 = t0 < 0 ? 0 : t0*t0*t0*t0*(g0[0]*x0+g0[1]*y0)
-  const t1 = 0.5 - x1*x1 - y1*y1, n1 = t1 < 0 ? 0 : t1*t1*t1*t1*(g1[0]*x1+g1[1]*y1)
-  const t2 = 0.5 - x2*x2 - y2*y2, n2 = t2 < 0 ? 0 : t2*t2*t2*t2*(g2[0]*x2+g2[1]*y2)
-  return 70 * (n0 + n1 + n2)
+const F2=0.5*(Math.sqrt(3)-1),G2=(3-Math.sqrt(3))/6
+const G=[[ 1,1],[-1, 1],[ 1,-1],[-1,-1],[ 1,0],[-1,0],[ 0,1],[ 0,-1]]
+function noise(x,y){
+  const s=(x+y)*F2,i=Math.floor(x+s),j=Math.floor(y+s),t=(i+j)*G2
+  const x0=x-(i-t),y0=y-(j-t),i1=x0>y0?1:0,j1=x0>y0?0:1
+  const x1=x0-i1+G2,y1=y0-j1+G2,x2=x0-1+2*G2,y2=y0-1+2*G2
+  const ii=i&255,jj=j&255
+  const g0=G[_p[ii+_p[jj]]%8],g1=G[_p[ii+i1+_p[jj+j1]]%8],g2=G[_p[ii+1+_p[jj+1]]%8]
+  const t0=0.5-x0*x0-y0*y0,n0=t0<0?0:t0*t0*t0*t0*(g0[0]*x0+g0[1]*y0)
+  const t1=0.5-x1*x1-y1*y1,n1=t1<0?0:t1*t1*t1*t1*(g1[0]*x1+g1[1]*y1)
+  const t2=0.5-x2*x2-y2*y2,n2=t2<0?0:t2*t2*t2*t2*(g2[0]*x2+g2[1]*y2)
+  return 70*(n0+n1+n2) // -1..1
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ridge(nx, ny) {
-  const v = sn(nx, ny)
-  const r = 1 - Math.abs(v)
-  return r * r * r
-}
-
-const DS = 3
-
-const LAYERS = [
-  { ox:  0.00, oy:  0.00, freq: 5.5,  speed: 0.00011, w: 1.00 },
-  { ox: 17.30, oy:  5.50, freq: 9.0,  speed: 0.00016, w: 0.70 },
-  { ox:  8.10, oy: 23.40, freq: 14.0, speed: 0.00008, w: 0.40 },
+// 6 gradient blobs, each with its own noise-driven position and size
+const BLOBS = [
+  { nx:0,    ny:0,    freq:0.28, sp:0.00018, baseX:0.72, baseY:0.60, r:0.42, a:0.82 },
+  { nx:5.1,  ny:2.3,  freq:0.22, sp:0.00013, baseX:0.88, baseY:0.30, r:0.30, a:0.55 },
+  { nx:12.4, ny:7.1,  freq:0.35, sp:0.00024, baseX:0.60, baseY:0.72, r:0.28, a:0.48 },
+  { nx:3.7,  ny:14.2, freq:0.18, sp:0.00010, baseX:0.95, baseY:0.55, r:0.22, a:0.38 },
+  { nx:8.9,  ny:3.6,  freq:0.40, sp:0.00030, baseX:0.78, baseY:0.20, r:0.18, a:0.32 },
+  { nx:1.2,  ny:9.8,  freq:0.25, sp:0.00016, baseX:0.55, baseY:0.45, r:0.24, a:0.42 },
 ]
-const W_SUM = 2.10
 
 export default function ParticleCanvas() {
   const canvasRef = useRef(null)
@@ -54,107 +40,90 @@ export default function ParticleCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-
-    const ctx = canvas.getContext('2d', { alpha: false })
+    const ctx = canvas.getContext('2d', { alpha: true })
     let animId, W = 0, H = 0, t = 0
-    let tMx = 0.72, tMy = 0.22, smx = 0.72, smy = 0.22
+    let mxT = 0.72, myT = 0.50, mx = 0.72, my = 0.50
     let scrollY = 0
-    let canvasOpacity = 1
-
-    const lo   = document.createElement('canvas')
-    const lctx = lo.getContext('2d', { alpha: false, willReadFrequently: true })
 
     const resize = () => {
-      W = canvas.width = window.innerWidth
+      W = canvas.width  = window.innerWidth
       H = canvas.height = window.innerHeight
-      lo.width  = Math.ceil(W / DS)
-      lo.height = Math.ceil(H / DS)
     }
     resize()
     window.addEventListener('resize', resize, { passive: true })
     window.addEventListener('mousemove', e => {
-      tMx = e.clientX / window.innerWidth
-      tMy = e.clientY / window.innerHeight
+      mxT = e.clientX / window.innerWidth
+      myT = e.clientY / window.innerHeight
     }, { passive: true })
-    // Track scroll to fade canvas out when user scrolls past hero
-    window.addEventListener('scroll', () => {
-      scrollY = window.scrollY
-    }, { passive: true })
+    window.addEventListener('scroll', () => { scrollY = window.scrollY }, { passive: true })
 
     const draw = () => {
       t++
-      smx += (tMx - smx) * 0.025
-      smy += (tMy - smy) * 0.025
+      mx += (mxT - mx) * 0.02
+      my += (myT - my) * 0.02
 
-      // Fade out canvas as user scrolls: fully visible at scroll 0,
-      // completely faded by scroll = H * 0.5 (halfway through viewport height)
-      const targetOpacity = Math.max(0, 1 - scrollY / (H * 0.5))
-      canvasOpacity += (targetOpacity - canvasOpacity) * 0.1
-      canvas.style.opacity = canvasOpacity.toFixed(3)
+      // Scroll fade
+      const tgt = Math.max(0, 1 - scrollY / (H * 0.45))
+      canvas.style.opacity = tgt.toFixed(3)
 
-      const lW = lo.width, lH = lo.height
-      const img = lctx.createImageData(lW, lH)
-      const d = img.data
+      ctx.clearRect(0, 0, W, H)
 
-      const fcx = lW * (0.70 + smx * 0.05)
-      const fcy = lH * (0.18 + smy * 0.05)
-      const mwx = (smx - 0.5) * 0.14
-      const mwy = (smy - 0.5) * 0.10
+      // Draw each blob as a large radial gradient
+      // The blobs are positioned using noise for organic drift
+      // + mouse offset for interactivity
+      for (let i = 0; i < BLOBS.length; i++) {
+        const b = BLOBS[i]
+        const tm = t * b.sp
 
-      const xStart = Math.floor(lW * 0.44)
-      const yEnd   = Math.floor(lH * 0.76)
+        // Noise-driven position offset (slow organic drift)
+        const ox = noise(b.nx + tm, b.ny + tm * 0.7) * 0.18
+        const oy = noise(b.nx + tm * 0.6 + 3.3, b.ny + tm + 1.1) * 0.14
 
-      for (let py = 0; py < yEnd; py++) {
-        const fy = py / lH
-        for (let px = xStart; px < lW; px++) {
-          const fx = px / lW
+        // Mouse influence (closer blobs react more)
+        const mInfluence = (i % 3 === 0) ? 0.12 : (i % 3 === 1) ? 0.07 : 0.04
 
-          const ddx = (px - fcx) / (lW * 0.48)
-          const ddy = (py - fcy) / (lH * 0.48)
-          const radFade = Math.max(0, 1 - (ddx*ddx + ddy*ddy))
-          if (radFade < 0.01) continue
+        const cx = (b.baseX + ox + (mx - 0.5) * mInfluence) * W
+        const cy = (b.baseY + oy + (my - 0.5) * mInfluence) * H
 
-          const eL = Math.min(1, (fx - 0.44) / 0.06)
-          const eR = Math.min(1, (1.0  - fx) / 0.05)
-          const eT = Math.min(1, fy / 0.05)
-          const eB = Math.min(1, (0.76 - fy) / 0.08)
-          const eFade = Math.min(eL, eR, eT, eB)
-          if (eFade <= 0) continue
+        // Radius also slowly breathes
+        const breathe = 1 + noise(b.nx + tm * 1.3, b.ny * 2 + tm) * 0.15
+        const rx = b.r * breathe * W
+        const ry = b.r * breathe * H * 0.7
+        const R = Math.max(rx, ry)
 
-          const mask = Math.pow(radFade, 1.5) * eFade
+        // Create radial gradient for this blob
+        // Inner: bright lime-white core
+        // Mid: rich lime
+        // Outer: deep dark lime-black, transparent
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, R)
+        grad.addColorStop(0.00, `rgba(220,255,60,${b.a * 0.35})`)   // bright lime core
+        grad.addColorStop(0.15, `rgba(184,242,36,${b.a * 0.55})`)   // #b8f224 lime
+        grad.addColorStop(0.35, `rgba(120,180,10,${b.a * 0.42})`)   // mid lime
+        grad.addColorStop(0.58, `rgba(40,80,5,${b.a * 0.28})`)      // dark lime
+        grad.addColorStop(0.80, `rgba(10,25,2,${b.a * 0.10})`)      // near-black
+        grad.addColorStop(1.00, `rgba(0,0,0,0)`)                     // transparent
 
-          let bright = 0
-          for (let li = 0; li < LAYERS.length; li++) {
-            const L = LAYERS[li]
-            const tm = t * L.speed
-            bright += ridge(
-              fx * L.freq + L.ox + tm        + mwx,
-              fy * L.freq + L.oy + tm * 0.68 + mwy
-            ) * L.w
-          }
-
-          const norm  = bright / W_SUM
-          const sharp = Math.pow(norm, 3.5)
-          if (sharp < 0.005) continue
-
-          const lum = sharp * mask
-          const r = Math.round(lum * 184)
-          const g = Math.round(lum * 242)
-          const b = Math.round(lum * 36)
-
-          const idx = (py * lW + px) * 4
-          d[idx]   = r
-          d[idx+1] = g
-          d[idx+2] = b
-          d[idx+3] = 255
-        }
+        ctx.globalCompositeOperation = 'screen'
+        ctx.fillStyle = grad
+        ctx.beginPath()
+        // Draw an ellipse for each blob
+        ctx.ellipse(cx, cy, rx, ry, noise(b.nx*2, b.ny*2+tm*0.3) * 0.8, 0, Math.PI * 2)
+        ctx.fill()
       }
-      lctx.putImageData(img, 0, 0)
 
-      ctx.fillStyle = '#000000'
+      // Final edge glow pass: bright lime rim along the "horizon" of all blobs
+      // Uses a wide horizontal gradient that simulates the hot edge seen in the Spline reference
+      ctx.globalCompositeOperation = 'screen'
+      const rimGrad = ctx.createLinearGradient(W * 0.35, H * 0.15, W * 1.1, H * 0.85)
+      rimGrad.addColorStop(0.0,  'rgba(0,0,0,0)')
+      rimGrad.addColorStop(0.30, `rgba(184,242,36,0.04)`)
+      rimGrad.addColorStop(0.50, `rgba(220,255,80,0.08)`)
+      rimGrad.addColorStop(0.70, `rgba(184,242,36,0.05)`)
+      rimGrad.addColorStop(1.0,  'rgba(0,0,0,0)')
+      ctx.fillStyle = rimGrad
       ctx.fillRect(0, 0, W, H)
-      ctx.drawImage(lo, 0, 0, W, H)
 
+      ctx.globalCompositeOperation = 'source-over'
       animId = requestAnimationFrame(draw)
     }
     draw()
@@ -169,7 +138,6 @@ export default function ParticleCanvas() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 w-full h-full pointer-events-none z-0"
-      style={{ mixBlendMode: 'screen' }}
     />
   )
 }
