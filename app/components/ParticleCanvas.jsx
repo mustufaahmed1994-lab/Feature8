@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef } from 'react'
 
-// ─── Minimal 2D Simplex Noise (Stefan Gustavson, no npm) ─────────────────────
+// ─── 2D Simplex Noise (Stefan Gustavson) ────────────────────────────────────
 const _perm = new Uint8Array(512)
 ;(function seed() {
   const base = new Uint8Array(256)
@@ -12,36 +12,41 @@ const _perm = new Uint8Array(512)
   }
   for (let i = 0; i < 512; i++) _perm[i] = base[i & 255]
 })()
-const _F2 = 0.5 * (Math.sqrt(3) - 1)
-const _G2 = (3 - Math.sqrt(3)) / 6
-const _grad2 = [[1,1],[-1,1],[1,-1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]]
-function simplex2(xin, yin) {
-  const s = (xin + yin) * _F2
-  const i = Math.floor(xin + s), j = Math.floor(yin + s)
-  const t = (i + j) * _G2
-  const x0 = xin - (i - t), y0 = yin - (j - t)
-  const i1 = x0 > y0 ? 1 : 0, j1 = x0 > y0 ? 0 : 1
-  const x1 = x0 - i1 + _G2, y1 = y0 - j1 + _G2
-  const x2 = x0 - 1 + 2*_G2, y2 = y0 - 1 + 2*_G2
-  const ii = i & 255, jj = j & 255
-  const g0 = _grad2[_perm[ii + _perm[jj]] % 8]
-  const g1 = _grad2[_perm[ii+i1 + _perm[jj+j1]] % 8]
-  const g2 = _grad2[_perm[ii+1  + _perm[jj+1]]  % 8]
-  const t0 = 0.5-x0*x0-y0*y0, n0 = t0<0?0:(t0*t0)*(t0*t0)*(g0[0]*x0+g0[1]*y0)
-  const t1 = 0.5-x1*x1-y1*y1, n1 = t1<0?0:(t1*t1)*(t1*t1)*(g1[0]*x1+g1[1]*y1)
-  const t2 = 0.5-x2*x2-y2*y2, n2 = t2<0?0:(t2*t2)*(t2*t2)*(g2[0]*x2+g2[1]*y2)
-  return 70*(n0+n1+n2)
+const _F2 = 0.5*(Math.sqrt(3)-1), _G2 = (3-Math.sqrt(3))/6
+const _g2 = [[1,1],[-1,1],[1,-1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]]
+function sn(xin, yin) {
+  const s=(xin+yin)*_F2, i=Math.floor(xin+s), j=Math.floor(yin+s)
+  const t=(i+j)*_G2, x0=xin-(i-t), y0=yin-(j-t)
+  const i1=x0>y0?1:0, j1=x0>y0?0:1
+  const x1=x0-i1+_G2, y1=y0-j1+_G2, x2=x0-1+2*_G2, y2=y0-1+2*_G2
+  const ii=i&255, jj=j&255
+  const g0=_g2[_perm[ii+_perm[jj]]%8], g1=_g2[_perm[ii+i1+_perm[jj+j1]]%8], g2=_g2[_perm[ii+1+_perm[jj+1]]%8]
+  const t0=0.5-x0*x0-y0*y0, n0=t0<0?0:(t0*t0)*(t0*t0)*(g0[0]*x0+g0[1]*y0)
+  const t1=0.5-x1*x1-y1*y1, n1=t1<0?0:(t1*t1)*(t1*t1)*(g1[0]*x1+g1[1]*y1)
+  const t2=0.5-x2*x2-y2*y2, n2=t2<0?0:(t2*t2)*(t2*t2)*(g2[0]*x2+g2[1]*y2)
+  return 70*(n0+n1+n2)  // range approx -1..1
+}
+// Numerical gradient — sample noise at offset ±eps, compute slope magnitude
+// High gradient = caustic vein location (steep slope of noise field)
+const EPS = 0.004
+function causticVal(x, y) {
+  const dx = (sn(x+EPS, y) - sn(x-EPS, y)) / (2*EPS)
+  const dy = (sn(x, y+EPS) - sn(x, y-EPS)) / (2*EPS)
+  const grad = Math.sqrt(dx*dx + dy*dy)
+  // Invert and sharpen — peaks where gradient is steepest
+  return Math.pow(Math.min(1, grad / 28), 0.55)
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Render at 1/4 resolution then scale up — gives smooth bilinear caustic veins
-// with zero pixelation. Each layer adds a different noise octave.
-const SCALE = 4   // downscale factor (higher = faster, smoother)
+// Render at 1/3 resolution, bilinear-scale up
+const DS = 3  // downsample factor
+
+// Four caustic layers — different noise scales/speeds for multi-layer depth
 const LAYERS = [
-  { ox:  0.0, oy:  0.0,  freq: 2.6, speed: 0.00014, thresh: 0.66, brightness: 1.00 },
-  { ox: 17.3, oy:  5.5,  freq: 4.1, speed: 0.00020, thresh: 0.70, brightness: 0.70 },
-  { ox:  8.1, oy: 23.4,  freq: 6.8, speed: 0.00009, thresh: 0.74, brightness: 0.45 },
-  { ox: 31.0, oy: 12.7,  freq: 3.3, speed: 0.00025, thresh: 0.68, brightness: 0.35 },
+  { ox:  0.00, oy:  0.00, freq: 8.0,  speed: 0.00016, weight: 1.00 },
+  { ox: 17.30, oy:  5.50, freq: 13.5, speed: 0.00022, weight: 0.60 },
+  { ox:  8.10, oy: 23.40, freq: 19.0, speed: 0.00011, weight: 0.38 },
+  { ox: 31.00, oy: 12.70, freq: 6.5,  speed: 0.00027, weight: 0.28 },
 ]
 
 export default function ParticleCanvas() {
@@ -51,150 +56,129 @@ export default function ParticleCanvas() {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d', { alpha: true })
-    let animId
-    let W = 0, H = 0
-    let t = 0
-    let targetMx = 0.65, targetMy = 0.30
-    let smoothMx = 0.65, smoothMy = 0.30
+    let animId, W = 0, H = 0, t = 0
+    let targetMx = 0.70, targetMy = 0.28
+    let smx = 0.70, smy = 0.28
 
-    // Low-res offscreen canvas — written as ImageData, drawn scaled to full canvas
     const lo = document.createElement('canvas')
     const lctx = lo.getContext('2d', { alpha: true, willReadFrequently: true })
 
     const resize = () => {
-      W = canvas.width  = window.innerWidth
+      W = canvas.width = window.innerWidth
       H = canvas.height = window.innerHeight
-      lo.width  = Math.ceil(W  / SCALE)
-      lo.height = Math.ceil(H / SCALE)
+      lo.width  = Math.ceil(W / DS)
+      lo.height = Math.ceil(H / DS)
     }
     resize()
     window.addEventListener('resize', resize, { passive: true })
-    const onMove = e => {
+    window.addEventListener('mousemove', e => {
       targetMx = e.clientX / window.innerWidth
       targetMy = e.clientY / window.innerHeight
-    }
-    window.addEventListener('mousemove', onMove, { passive: true })
+    }, { passive: true })
 
     const draw = () => {
       t++
-      smoothMx += (targetMx - smoothMx) * 0.04
-      smoothMy += (targetMy - smoothMy) * 0.04
+      smx += (targetMx - smx) * 0.04
+      smy += (targetMy - smy) * 0.04
 
       const lW = lo.width, lH = lo.height
       const img = lctx.createImageData(lW, lH)
-      const data = img.data
+      const d = img.data
 
-      // Focal centre in low-res coords — right-of-centre, upper area
-      const fcx = lW * (0.62 + smoothMx * 0.08)
-      const fcy = lH * (0.30 + smoothMy * 0.06)
-      // Max radial distance for vignette
-      const maxD = Math.sqrt(lW * lW + lH * lH) * 0.55
-
-      // Mouse warp offsets
-      const mwx = (smoothMx - 0.5) * 0.22
-      const mwy = (smoothMy - 0.5) * 0.14
+      // Focal centre — upper-right, mouse-reactive
+      const fcx = lW * (0.60 + smx * 0.10)
+      const fcy = lH * (0.28 + smy * 0.07)
+      // Mouse distortion offsets to noise coords
+      const mwx = (smx - 0.5) * 0.30
+      const mwy = (smy - 0.5) * 0.20
 
       for (let py = 0; py < lH; py++) {
+        const fy = py / lH
+        if (fy > 0.85) continue
+
         for (let px = 0; px < lW; px++) {
-          // Fractional position (0..1)
-          const fx = px / lW, fy = py / lH
+          const fx = px / lW
+          if (fx < 0.18) continue  // left 18% stays dark
 
-          // Only compute right portion of screen (left 30% stays dark)
-          if (fx < 0.22) { continue }
-          // Only compute top 80%
-          if (fy > 0.82) { continue }
-
-          // Radial fade from focal point — smooth falloff
-          const dx = (px - fcx) / lW, dy = (py - fcy) / lH
-          const dist = Math.sqrt(dx*dx * 1.5 + dy*dy)
-          const radFade = Math.max(0, 1 - dist * 1.6)
+          // Radial fade — falls off from focal centre
+          const ddx = (px - fcx) / lW, ddy = (py - fcy) / lH
+          const distSq = ddx*ddx * 1.4 + ddy*ddy
+          const radFade = Math.max(0, 1 - distSq * 2.8)
           if (radFade < 0.01) continue
 
-          // Edge fades for natural dissolution
-          const edgeL = Math.min(1, (fx - 0.22) / 0.12)
-          const edgeR = Math.min(1, (1.0 - fx) / 0.08)
-          const edgeT = Math.min(1, (fy + 0.05) / 0.06)
-          const edgeB = Math.min(1, (0.82 - fy) / 0.14)
-          const edgeFade = Math.min(edgeL, edgeR, edgeT, edgeB)
-          if (edgeFade <= 0) continue
+          // Edge dissolve
+          const eL = Math.min(1, (fx - 0.18) / 0.10)
+          const eR = Math.min(1, (1.0 - fx) / 0.07)
+          const eT = Math.min(1, fy / 0.05 + 0.3)
+          const eB = Math.min(1, (0.85 - fy) / 0.12)
+          const eFade = Math.min(eL, eR, eT, eB)
+          if (eFade <= 0) continue
 
-          const combine = radFade * edgeFade
+          const mask = radFade * eFade
 
-          // Sample all noise layers and accumulate
-          let totalR = 0, totalG = 0, totalB = 0, totalA = 0
-
+          // Accumulate caustic brightness from all layers
+          let bright = 0
           LAYERS.forEach(L => {
             const time = t * L.speed
             const nx = fx * L.freq + L.ox + time + mwx
-            const ny = fy * L.freq + L.oy + time * 0.65 + mwy
-            const raw = simplex2(nx, ny)
-            const v = Math.abs(raw)  // fold to 0..1
-
-            if (v < L.thresh) return
-
-            // Sharp vein brightness — thin bright lines above threshold
-            const vein = Math.pow((v - L.thresh) / (1 - L.thresh), 0.45)
-
-            const a = vein * combine * L.brightness
-
-            // Color: bright yellow-lime core fading to deeper lime at edges
-            // Core: rgba(240,255,160) — hot white-lime
-            // Mid:  rgba(184,242,36)  — brand lime
-            // Edge: rgba(80,160,20)   — deep lime
-            const coreMix = Math.pow(vein, 1.8)
-            const r = Math.round(80  + coreMix * (240 - 80))
-            const g = Math.round(160 + coreMix * (255 - 160))
-            const b = Math.round(20  + coreMix * (160 - 20))
-
-            // Additive blend in float (max to avoid oversaturation)
-            totalR = Math.min(255, totalR + r * a)
-            totalG = Math.min(255, totalG + g * a)
-            totalB = Math.min(255, totalB + b * a)
-            totalA = Math.min(1,   totalA + a * 0.92)
+            const ny = fy * L.freq + L.oy + time * 0.62 + mwy
+            bright += causticVal(nx, ny) * L.weight
           })
+          // Normalize by sum of weights and sharpen curve
+          const totalW = 1.00 + 0.60 + 0.38 + 0.28
+          const norm = Math.min(1, bright / totalW)
+          const sharpened = Math.pow(norm, 1.6)  // push most pixels darker, peaks brighter
 
-          if (totalA < 0.005) continue
+          const a = sharpened * mask
+          if (a < 0.015) continue
+
+          // Color gradient: bright core = near-white lime, dimmer = deep lime
+          const r = Math.round(60  + sharpened * (245 - 60))
+          const g = Math.round(140 + sharpened * (255 - 140))
+          const b = Math.round(10  + sharpened * (120 - 10))
+
           const idx = (py * lW + px) * 4
-          data[idx]   = Math.round(totalR)
-          data[idx+1] = Math.round(totalG)
-          data[idx+2] = Math.round(totalB)
-          data[idx+3] = Math.round(totalA * 255)
+          d[idx]   = r
+          d[idx+1] = g
+          d[idx+2] = b
+          d[idx+3] = Math.round(a * 230)
         }
       }
-
       lctx.putImageData(img, 0, 0)
 
-      // ── Composite to main canvas with scaling (bilinear) ─────────────────
+      // ── Composite ────────────────────────────────────────────────────────
       ctx.clearRect(0, 0, W, H)
 
-      // Bloom: draw scaled lo-res at slight offsets at low alpha for glow
-      ctx.globalAlpha = 0.22
-      const bOff = 3 * SCALE  // bloom offset in full-res pixels
-      const blOffsets = [[-bOff,-bOff],[0,-bOff],[bOff,-bOff],[-bOff,0],[bOff,0],[-bOff,bOff],[0,bOff],[bOff,bOff]]
-      blOffsets.forEach(([dx,dy]) => {
-        ctx.drawImage(lo, dx, dy, W + Math.abs(dx), H + Math.abs(dy))
-      })
-
-      // Wider softer bloom ring
-      ctx.globalAlpha = 0.09
-      const bOff2 = 6 * SCALE
-      const blOffsets2 = [[-bOff2,-bOff2],[0,-bOff2],[bOff2,-bOff2],[-bOff2,0],[bOff2,0],[-bOff2,bOff2],[0,bOff2],[bOff2,bOff2]]
-      blOffsets2.forEach(([dx,dy]) => {
-        ctx.drawImage(lo, dx, dy, W, H)
-      })
-
-      // Sharp caustic layer
+      // Bloom: 8-directional offset at low alpha
+      const bo = 2 * DS
+      ctx.globalAlpha = 0.18
+      for (let dx = -bo; dx <= bo; dx += bo) {
+        for (let dy = -bo; dy <= bo; dy += bo) {
+          if (dx === 0 && dy === 0) continue
+          ctx.drawImage(lo, dx, dy, W, H)
+        }
+      }
+      // Wider bloom ring
+      const bo2 = 5 * DS
+      ctx.globalAlpha = 0.08
+      for (let dx = -bo2; dx <= bo2; dx += bo2) {
+        for (let dy = -bo2; dy <= bo2; dy += bo2) {
+          if (dx === 0 && dy === 0) continue
+          ctx.drawImage(lo, dx, dy, W, H)
+        }
+      }
+      // Sharp layer
       ctx.globalAlpha = 1
       ctx.drawImage(lo, 0, 0, W, H)
 
       // ── Vignette ─────────────────────────────────────────────────────────
-      const vx = W * 0.68, vy = H * 0.28
-      const vign = ctx.createRadialGradient(vx, vy, 0, vx, vy, Math.max(W, H) * 0.75)
+      const vx = W * 0.66, vy = H * 0.25
+      const vign = ctx.createRadialGradient(vx, vy, 0, vx, vy, Math.max(W,H) * 0.80)
       vign.addColorStop(0,    'rgba(8,8,8,0)')
-      vign.addColorStop(0.28, 'rgba(8,8,8,0)')
-      vign.addColorStop(0.60, 'rgba(8,8,8,0.40)')
-      vign.addColorStop(0.82, 'rgba(8,8,8,0.72)')
-      vign.addColorStop(1,    'rgba(8,8,8,0.96)')
+      vign.addColorStop(0.25, 'rgba(8,8,8,0)')
+      vign.addColorStop(0.58, 'rgba(8,8,8,0.38)')
+      vign.addColorStop(0.80, 'rgba(8,8,8,0.72)')
+      vign.addColorStop(1,    'rgba(8,8,8,0.97)')
       ctx.fillStyle = vign
       ctx.fillRect(0, 0, W, H)
 
@@ -205,7 +189,6 @@ export default function ParticleCanvas() {
     return () => {
       cancelAnimationFrame(animId)
       window.removeEventListener('resize', resize)
-      window.removeEventListener('mousemove', onMove)
     }
   }, [])
 
