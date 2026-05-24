@@ -33,14 +33,14 @@ function sn(xin, yin) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Ridge noise — cubic sharpening creates ultra-thin bright peaks with true-black gaps.
+// Ridge noise: fold around zero → thin bright peaks, true black between them
 function ridge(nx, ny) {
   const v = sn(nx, ny)
   const r = 1 - Math.abs(v)
-  return r * r * r  // cubic = ultra-thin veins, true black elsewhere
+  return r * r * r
 }
 
-// DS=3: render at 1/3 resolution for sharper veins + less bilinear blur spread
+// DS=3: 1/3 resolution offscreen buffer
 const DS = 3
 
 const LAYERS = [
@@ -56,7 +56,12 @@ export default function ParticleCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const ctx = canvas.getContext('2d', { alpha: true })
+
+    // IMPORTANT: opaque canvas so screen blend works correctly.
+    // We fill the canvas background to pure black (#080808),
+    // then draw bright lime veins. Screen blend with the page makes
+    // only the bright veins visible — dark areas disappear into page bg.
+    const ctx = canvas.getContext('2d', { alpha: false })
     let animId, W = 0, H = 0, t = 0
     let tMx = 0.72, tMy = 0.22, smx = 0.72, smy = 0.22
 
@@ -85,13 +90,11 @@ export default function ParticleCanvas() {
       const img = lctx.createImageData(lW, lH)
       const d = img.data
 
-      // Focal centre — upper-right, gently reactive to mouse
       const fcx = lW * (0.70 + smx * 0.05)
       const fcy = lH * (0.18 + smy * 0.05)
       const mwx = (smx - 0.5) * 0.14
       const mwy = (smy - 0.5) * 0.10
 
-      // Active zone: right 55%, top 76% of viewport
       const xStart = Math.floor(lW * 0.44)
       const yEnd   = Math.floor(lH * 0.76)
 
@@ -100,13 +103,11 @@ export default function ParticleCanvas() {
         for (let px = xStart; px < lW; px++) {
           const fx = px / lW
 
-          // Elliptical radial mask from focal centre
           const ddx = (px - fcx) / (lW * 0.48)
           const ddy = (py - fcy) / (lH * 0.48)
           const radFade = Math.max(0, 1 - (ddx*ddx + ddy*ddy))
           if (radFade < 0.01) continue
 
-          // Soft edge feather to fade into pure black
           const eL = Math.min(1, (fx - 0.44) / 0.06)
           const eR = Math.min(1, (1.0  - fx) / 0.05)
           const eT = Math.min(1, fy / 0.05)
@@ -116,7 +117,6 @@ export default function ParticleCanvas() {
 
           const mask = Math.pow(radFade, 1.5) * eFade
 
-          // Sum ridge noise across layers
           let bright = 0
           for (let li = 0; li < LAYERS.length; li++) {
             const L = LAYERS[li]
@@ -127,35 +127,36 @@ export default function ParticleCanvas() {
             ) * L.w
           }
 
-          // Ultra-aggressive sharpening: pow 3.5 = only razor-thin peaks survive
           const norm  = bright / W_SUM
           const sharp = Math.pow(norm, 3.5)
-          if (sharp < 0.004) continue
+          if (sharp < 0.005) continue
 
           const a = sharp * mask
-          if (a < 0.004) continue
+          if (a < 0.005) continue
 
-          // KEY FIX: Pure bright lime-white at peak.
-          // High R + high G + near-zero B = clean acid lime, not olive.
-          // When bilinear interpolation blends these pixels into black neighbors,
-          // the result is a clean bright-lime halo, not a murky green cloud.
-          const r = Math.round(184 + sharp * 71)   // 184→255 range
-          const g = Math.round(242 + sharp * 13)   // 242→255 range (near-white at peak)
-          const b = Math.round(0   + sharp * 36)   // 0→36 range (minimal blue)
-          const a8 = Math.round(a * 200)
+          // Render as opaque bright lime RGB (no alpha).
+          // Screen blend on canvas handles the fade — dark = invisible, bright = vivid.
+          // This completely avoids the pre-multiplied-alpha olive problem.
+          const lum = a * sharp
+          const r = Math.round(lum * 184)
+          const g = Math.round(lum * 242)
+          const b = Math.round(lum * 36)
 
           const idx = (py * lW + px) * 4
           d[idx]   = r
           d[idx+1] = g
           d[idx+2] = b
-          d[idx+3] = a8
+          d[idx+3] = 255  // fully opaque — color IS the intensity
         }
       }
       lctx.putImageData(img, 0, 0)
 
-      // No blur filter — DS=3 bilinear upscale provides natural softness
-      // without spreading olive-green haze into the black background
-      ctx.clearRect(0, 0, W, H)
+      // Fill main canvas with page background color
+      ctx.fillStyle = '#080808'
+      ctx.fillRect(0, 0, W, H)
+
+      // Screen-like additive composite: source-over still works here
+      // because our lo buffer is opaque with RGB encoding intensity.
       ctx.globalAlpha = 1
       ctx.drawImage(lo, 0, 0, W, H)
 
@@ -173,7 +174,7 @@ export default function ParticleCanvas() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 w-full h-full pointer-events-none z-0"
-      style={{ opacity: 1 }}
+      style={{ mixBlendMode: 'screen', opacity: 1 }}
     />
   )
 }
