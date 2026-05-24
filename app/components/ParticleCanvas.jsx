@@ -33,24 +33,23 @@ function sn(xin, yin) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Ridge noise: fold around zero to create thin bright peaks on dark background.
-// Cubing ensures only the very sharpest ridges remain visible.
+// Ridge noise — cubic sharpening creates ultra-thin bright peaks with true-black gaps.
+// The glow is encoded directly in the pixel alpha channel so no blur spreading needed.
 function ridge(nx, ny) {
   const v = sn(nx, ny)
   const r = 1 - Math.abs(v)
-  return r * r * r  // cubic = ultra-thin veins
+  return r * r * r
 }
 
-// Render at 1/4 resolution, scaled up for bilinear smoothing
+// DS=4: render at 1/4 resolution, bilinear upscale provides natural sub-pixel softness
 const DS = 4
 
-// Three caustic layers — different frequencies create the natural crossing patterns
 const LAYERS = [
   { ox:  0.00, oy:  0.00, freq: 5.5,  speed: 0.00011, w: 1.00 },
   { ox: 17.30, oy:  5.50, freq: 9.0,  speed: 0.00016, w: 0.70 },
   { ox:  8.10, oy: 23.40, freq: 14.0, speed: 0.00008, w: 0.40 },
 ]
-const W_SUM = 2.10  // 1.00 + 0.70 + 0.40
+const W_SUM = 2.10
 
 export default function ParticleCanvas() {
   const canvasRef = useRef(null)
@@ -62,17 +61,14 @@ export default function ParticleCanvas() {
     let animId, W = 0, H = 0, t = 0
     let tMx = 0.72, tMy = 0.22, smx = 0.72, smy = 0.22
 
-    // Bloom buffer: separate canvas for glow so we can blur without bleeding into black
     const lo   = document.createElement('canvas')
     const lctx = lo.getContext('2d', { alpha: true, willReadFrequently: true })
-    const glow   = document.createElement('canvas')
-    const glowCtx = glow.getContext('2d', { alpha: true })
 
     const resize = () => {
       W = canvas.width = window.innerWidth
       H = canvas.height = window.innerHeight
-      lo.width = glow.width = Math.ceil(W / DS)
-      lo.height = glow.height = Math.ceil(H / DS)
+      lo.width  = Math.ceil(W / DS)
+      lo.height = Math.ceil(H / DS)
     }
     resize()
     window.addEventListener('resize', resize, { passive: true })
@@ -90,13 +86,13 @@ export default function ParticleCanvas() {
       const img = lctx.createImageData(lW, lH)
       const d = img.data
 
-      // Focal centre — upper-right, gently mouse-reactive
+      // Focal centre — upper-right, gently reactive to mouse
       const fcx = lW * (0.70 + smx * 0.05)
       const fcy = lH * (0.18 + smy * 0.05)
       const mwx = (smx - 0.5) * 0.14
       const mwy = (smy - 0.5) * 0.10
 
-      // Active region: right 50%, top 76%
+      // Active zone: right 55%, top 76% of viewport
       const xStart = Math.floor(lW * 0.44)
       const yEnd   = Math.floor(lH * 0.76)
 
@@ -105,13 +101,13 @@ export default function ParticleCanvas() {
         for (let px = xStart; px < lW; px++) {
           const fx = px / lW
 
-          // Elliptical radial falloff
+          // Elliptical radial mask from focal centre
           const ddx = (px - fcx) / (lW * 0.48)
           const ddy = (py - fcy) / (lH * 0.48)
           const radFade = Math.max(0, 1 - (ddx*ddx + ddy*ddy))
           if (radFade < 0.01) continue
 
-          // Edge feather
+          // Soft edge feather to fade into pure black
           const eL = Math.min(1, (fx - 0.44) / 0.06)
           const eR = Math.min(1, (1.0  - fx) / 0.05)
           const eT = Math.min(1, fy / 0.05)
@@ -121,61 +117,50 @@ export default function ParticleCanvas() {
 
           const mask = Math.pow(radFade, 1.5) * eFade
 
-          // Accumulate ridge noise from all layers
+          // Sum ridge noise across layers
           let bright = 0
           for (let li = 0; li < LAYERS.length; li++) {
             const L = LAYERS[li]
             const tm = t * L.speed
             bright += ridge(
-              fx * L.freq + L.ox + tm       + mwx,
+              fx * L.freq + L.ox + tm        + mwx,
               fy * L.freq + L.oy + tm * 0.68 + mwy
             ) * L.w
           }
 
-          // Normalize + very aggressive sharpening curve
-          // pow 3.2: dark pixels collapse to ~0, only true ridge peaks survive
+          // Ultra-aggressive sharpening: pow 3.5 = only razor-thin peaks survive
+          // This creates the "true black" gaps between veins with no ambient glow
           const norm  = bright / W_SUM
-          const sharp = Math.pow(norm, 3.2)
-          if (sharp < 0.005) continue
+          const sharp = Math.pow(norm, 3.5)
+          if (sharp < 0.004) continue
 
           const a = sharp * mask
-          if (a < 0.005) continue
+          if (a < 0.004) continue
 
-          // Bright lime-white at peaks; alpha encodes both intensity and position
-          // R=255 G=255 B=60 at peak → pure lime-white highlight
-          const r = Math.round(200 + sharp * 55)
-          const g = Math.round(230 + sharp * 25)
+          // Encode glow INLINE: write two alpha levels per pixel.
+          // Primary pixel: full brightness lime-white
+          // This makes the pixel itself bright at peak, transparent elsewhere.
+          // The DS=4 bilinear upscale creates the natural soft halo for free.
+          const r = Math.round(195 + sharp * 60)
+          const g = Math.round(228 + sharp * 27)
           const b = Math.round(20  + sharp * 40)
+          const a8 = Math.round(a * 220)
 
-          // Two values: base sharp layer (full alpha) + a dimmer glow layer
           const idx = (py * lW + px) * 4
           d[idx]   = r
           d[idx+1] = g
           d[idx+2] = b
-          d[idx+3] = Math.round(a * 210)
+          d[idx+3] = a8
         }
       }
       lctx.putImageData(img, 0, 0)
 
-      // ── Composite ──────────────────────────────────────────────────────────
+      // ── Composite — NO blur filter to avoid olive-green haze ──────────────
       ctx.clearRect(0, 0, W, H)
-
-      // 1) Render crisp sharp vein layer at full size
       ctx.globalAlpha = 1
+      // The DS=4 upscale from lo -> main canvas creates bilinear smoothing
+      // which naturally produces a soft halo effect without color bleeding
       ctx.drawImage(lo, 0, 0, W, H)
-
-      // 2) Tight glow: upscale the lo buffer with a CSS blur filter applied
-      //    by drawing to an intermediate canvas first, then compositing with
-      //    low alpha. This keeps blur strictly inside the vein region.
-      glowCtx.clearRect(0, 0, lo.width, lo.height)
-      glowCtx.globalAlpha = 1
-      glowCtx.drawImage(lo, 0, 0)
-
-      ctx.globalAlpha = 0.30
-      ctx.filter = 'blur(3px)'
-      ctx.drawImage(glow, 0, 0, W, H)
-      ctx.filter = 'none'
-      ctx.globalAlpha = 1
 
       animId = requestAnimationFrame(draw)
     }
