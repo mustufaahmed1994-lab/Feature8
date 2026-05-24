@@ -33,14 +33,13 @@ function sn(xin, yin) {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Ridge noise: fold → thin bright peaks, near-zero elsewhere
 function ridge(nx, ny) {
   const v = sn(nx, ny)
   const r = 1 - Math.abs(v)
   return r * r * r
 }
 
-const DS = 3  // 1/3 resolution offscreen buffer
+const DS = 3
 
 const LAYERS = [
   { ox:  0.00, oy:  0.00, freq: 5.5,  speed: 0.00011, w: 1.00 },
@@ -56,13 +55,11 @@ export default function ParticleCanvas() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    // Opaque canvas + mix-blend-mode screen:
-    // - Pure black on canvas = invisible (screen(0,x) = x, so black passes through)
-    // - Bright lime on canvas = vivid accent over any dark background
-    // - Bilinear interpolation of lime pixels into black = lime-tinted halo, not olive
     const ctx = canvas.getContext('2d', { alpha: false })
     let animId, W = 0, H = 0, t = 0
     let tMx = 0.72, tMy = 0.22, smx = 0.72, smy = 0.22
+    let scrollY = 0
+    let canvasOpacity = 1
 
     const lo   = document.createElement('canvas')
     const lctx = lo.getContext('2d', { alpha: false, willReadFrequently: true })
@@ -79,11 +76,21 @@ export default function ParticleCanvas() {
       tMx = e.clientX / window.innerWidth
       tMy = e.clientY / window.innerHeight
     }, { passive: true })
+    // Track scroll to fade canvas out when user scrolls past hero
+    window.addEventListener('scroll', () => {
+      scrollY = window.scrollY
+    }, { passive: true })
 
     const draw = () => {
       t++
       smx += (tMx - smx) * 0.025
       smy += (tMy - smy) * 0.025
+
+      // Fade out canvas as user scrolls: fully visible at scroll 0,
+      // completely faded by scroll = H * 0.5 (halfway through viewport height)
+      const targetOpacity = Math.max(0, 1 - scrollY / (H * 0.5))
+      canvasOpacity += (targetOpacity - canvasOpacity) * 0.1
+      canvas.style.opacity = canvasOpacity.toFixed(3)
 
       const lW = lo.width, lH = lo.height
       const img = lctx.createImageData(lW, lH)
@@ -94,8 +101,6 @@ export default function ParticleCanvas() {
       const mwx = (smx - 0.5) * 0.14
       const mwy = (smy - 0.5) * 0.10
 
-      // All pixels start black (ImageData initializes to 0,0,0,255 for opaque ctx)
-      // Only paint bright pixels where veins are present
       const xStart = Math.floor(lW * 0.44)
       const yEnd   = Math.floor(lH * 0.76)
 
@@ -133,9 +138,6 @@ export default function ParticleCanvas() {
           if (sharp < 0.005) continue
 
           const lum = sharp * mask
-
-          // Bright lime color — R=184 G=242 B=36 at full brightness (#b8f224)
-          // Scaled by lum so dark areas remain black (screen(black,x) = x)
           const r = Math.round(lum * 184)
           const g = Math.round(lum * 242)
           const b = Math.round(lum * 36)
@@ -144,17 +146,13 @@ export default function ParticleCanvas() {
           d[idx]   = r
           d[idx+1] = g
           d[idx+2] = b
-          d[idx+3] = 255  // opaque, color encodes intensity
+          d[idx+3] = 255
         }
       }
       lctx.putImageData(img, 0, 0)
 
-      // Black background on main canvas
       ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, W, H)
-
-      // Upscale lo → main; bilinear interpolation spreads bright lime into
-      // adjacent black pixels naturally (lime halo, not olive blob)
       ctx.drawImage(lo, 0, 0, W, H)
 
       animId = requestAnimationFrame(draw)
