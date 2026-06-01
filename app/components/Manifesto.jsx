@@ -17,7 +17,7 @@ body: "We’re a technology, information, and media company. We build digital pr
 {
 num: '03',
 title: 'How We Run the Place',
-body: "We don’t do diplomatic vagueness. Say what you mean. We don’t do title politics. Your contribution matters more than your seniority. We don’t do busywork. If a meeting can be a message, it’s a message. We do expect excellence. Not performative effort but actual results.",
+body: "We don’t do diplomatic vagueness. Say what you mean. We don’t do title politics. Your contribution matters more than your seniority. We don’t do busywork. If a meeting can be a message it is a message. We do expect excellence. Not performative effort but actual results.",
 },
 {
 num: '04',
@@ -66,7 +66,6 @@ flexShrink: 0,
 {isOpen ? <Minus size={13} /> : <Plus size={13} />}
 </motion.div>
 </button>
-
 <AnimatePresence initial={false}>
 {isOpen && (
 <motion.div
@@ -93,7 +92,6 @@ export default function Manifesto() {
 const [openIndex, setOpenIndex] = useState(0);
 const ref = useRef(null);
 const inView = useInView(ref, { once: true, margin: '-80px' });
-
 return (
 <section className="section-pad" style={{ background: '#080808' }}>
 <div className="max-w-screen-xl mx-auto px-6 md:px-12">
@@ -105,20 +103,10 @@ transition={{ duration: 0.5 }}
 className="mb-12"
 >
 <p className="label mb-3">Our Manifesto</p>
-<h2
-style={{
-fontFamily: 'var(--font-barlow)',
-fontWeight: 700,
-fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-lineHeight: 1.05,
-color: 'white',
-maxWidth: 600,
-}}
->
+<h2 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.05, color: 'white', maxWidth: 600 }}>
 What Feature8 Actually Is.
 </h2>
 </motion.div>
-
 <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
 {ITEMS.map((item, i) => (
 <AccordionItem
