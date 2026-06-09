@@ -97,7 +97,7 @@ We run on night hours. Shifts are nine hours long and fall anywhere between 6PM 
           animate={imgInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.55, delay: 0.1 }}
           className="mb-12 rounded-2xl overflow-hidden"
-          style={{ height: 340, position: 'relative' }}
+          style={{ height: 459, position: 'relative' }}
         >
           <img src="/office.jpg" alt="Feature8 Office" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(to top, rgba(8,8,8,0.7), transparent)' }} />
