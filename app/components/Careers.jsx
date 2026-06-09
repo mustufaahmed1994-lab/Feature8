@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { ArrowUpRight, MapPin, Briefcase, ArrowRight, Users, Clock } from 'lucide-react';
+import { ArrowUpRight, MapPin, Briefcase, ArrowRight, Clock } from 'lucide-react';
 import ApplyModal from './ApplyModal';
 
 const JOBS = [
@@ -93,22 +93,19 @@ Apply <ArrowRight size={11} />
 <motion.div ref={processRef} initial={{ opacity: 0, y: 25 }} animate={processInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5 }}>
 <p className="label mb-8">How We Hire</p>
 
-{/* Image placeholder — team / office */}
-<motion.div
-initial={{ opacity: 0, y: 20 }}
-animate={processInView ? { opacity: 1, y: 0 } : {}}
-transition={{ duration: 0.5, delay: 0.1 }}
-className="mb-10 rounded-2xl overflow-hidden"
-style={{ height: 280, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
->
-<div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(184,242,36,0.04) 0%, rgba(0,0,0,0) 60%, rgba(0,200,155,0.03) 100%)' }} />
-<div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
-<Users size={28} color="rgba(184,242,36,0.3)" strokeWidth={1.2} style={{ margin: '0 auto 0.75rem' }} />
-<p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)' }}>Team Photo Coming Soon</p>
-</div>
-</motion.div>
+{/* How We Hire image */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={processInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-10 rounded-2xl overflow-hidden"
+            style={{ height: 280, position: 'relative' }}
+          >
+            <img src="/Image 3.png" alt="How We Hire" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(to top, rgba(8,8,8,0.7), transparent)' }} />
+          </motion.div>
 
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
 {PROCESS.map((step, i) => (
 <motion.div
 key={i}
