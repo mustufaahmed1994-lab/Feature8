@@ -1,7 +1,7 @@
 'use client';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Code2, BarChart3, Video, Globe, Cpu, Palette, Building2, ShoppingBag, GraduationCap, ArrowUpRight, Image as ImageIcon } from 'lucide-react';
+import { Code2, BarChart3, Video, Globe, Cpu, Palette, Building2, ShoppingBag, GraduationCap, ArrowUpRight } from 'lucide-react';
 
 const SERVICES = [
 { icon: Code2, title: 'Product Development', desc: 'We build software products that solve real problems. From MVPs to full-scale platforms, we own the outcome, not just the output.', tags: ['Web Apps', 'Mobile', 'SaaS'] },
@@ -62,24 +62,20 @@ return (
 })}
 </div>
 
-{/* Work showcase image placeholder */}
-<motion.div
-ref={imgRef}
-initial={{ opacity: 0, y: 20 }}
-animate={gridInView ? { opacity: 1, y: 0 } : {}}
-transition={{ duration: 0.55, delay: 0.45 }}
-className="mb-14 rounded-2xl overflow-hidden"
-style={{ height: 300, background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}
->
-<div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(184,242,36,0.03) 0%, rgba(0,0,0,0) 50%, rgba(0,200,155,0.02) 100%)' }} />
-<div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to top, rgba(10,10,10,0.6), transparent)' }} />
-<div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
-<ImageIcon size={28} color="rgba(184,242,36,0.22)" strokeWidth={1.2} style={{ margin: '0 auto 0.8rem' }} />
-<p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.63rem', fontWeight: 700, letterSpacing: '0.13em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.14)' }}>Work Showcase Coming Soon</p>
-</div>
-</motion.div>
+{/* Work showcase image */}
+        <motion.div
+          ref={imgRef}
+          initial={{ opacity: 0, y: 20 }}
+          animate={gridInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.55, delay: 0.45 }}
+          className="mb-14 rounded-2xl overflow-hidden"
+          style={{ height: 300, position: 'relative' }}
+        >
+          <img src="/Image 2.png" alt="What We Do" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to top, rgba(10,10,10,0.6), transparent)' }} />
+        </motion.div>
 
-{/* Markets section */}
+        {/* Markets section */}
 <motion.div initial={{ opacity: 0, y: 20 }} animate={gridInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.5, delay: 0.55 }}>
 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
 <p className="label">Markets We Serve</p>
