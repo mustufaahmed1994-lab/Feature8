@@ -99,7 +99,7 @@ Apply <ArrowRight size={11} />
             animate={processInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mb-10 rounded-2xl overflow-hidden"
-            style={{ height: 280, position: 'relative' }}
+            style={{ height: 378, position: 'relative' }}
           >
             <img src="/Image 3.png" alt="How We Hire" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(to top, rgba(8,8,8,0.7), transparent)' }} />
