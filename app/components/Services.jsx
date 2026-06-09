@@ -69,7 +69,7 @@ return (
           animate={gridInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.55, delay: 0.45 }}
           className="mb-14 rounded-2xl overflow-hidden"
-          style={{ height: 300, position: 'relative' }}
+          style={{ height: 405, position: 'relative' }}
         >
           <img src="/Image 2.png" alt="What We Do" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '45%', background: 'linear-gradient(to top, rgba(10,10,10,0.6), transparent)' }} />
