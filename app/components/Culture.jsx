@@ -141,7 +141,7 @@ export default function Culture() {
                                     style={{ height: 420, position: 'relative', background: 'rgba(255,255,255,0.025)', border: '1px dashed rgba(255,255,255,0.1)' }}
                                   >
                                   <img
-                                                src="/Karachi Cinematic Strip.png"
+                                                src="/Karachi%20Cinematic%20Strip.png"
                                                 alt="Karachi"
                                                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
                                               />
