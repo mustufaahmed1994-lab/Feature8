@@ -96,7 +96,6 @@ export default function Culture() {
             />
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%', background: 'linear-gradient(to top, rgba(8,8,8,0.75), transparent)' }} />
             <div style={{ position: 'absolute', bottom: '0.9rem', left: '1rem' }}>
-              <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>The workspace.</p>
             </div>
           </motion.div>
 
@@ -117,7 +116,6 @@ export default function Culture() {
             />
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%', background: 'linear-gradient(to top, rgba(8,8,8,0.75), transparent)' }} />
             <div style={{ position: 'absolute', bottom: '0.9rem', left: '1rem' }}>
-              <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>The team.</p>
             </div>
           </motion.div>
         </div>
