@@ -2,6 +2,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { MessageSquare, Lightbulb, Target, Clock, Shield, BookOpen, Users, Zap, Coffee, Laptop, Heart, TrendingUp } from 'lucide-react';
+import Image from 'next/image';
 
 const VALUES = [
   { icon: MessageSquare, title: 'Direct Communication', desc: "Say what you mean. We don't do diplomatic vagueness or corporate-speak." },
@@ -77,34 +78,48 @@ export default function Culture() {
         </motion.div>
 
         {/* Square image pair */}
-        <div ref={pairRef} className="grid grid-cols-2 gap-4 mb-12">
-          {[
-            { label: 'The workspace.', delay: 0 },
-            { label: 'The team.', delay: 0.12 },
-          ].map((img, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20, scale: 0.97 }}
-              animate={pairInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-              transition={{ duration: 0.55, delay: img.delay, ease: [0.22, 1, 0.36, 1] }}
-              className="rounded-2xl overflow-hidden"
-              style={{ aspectRatio: '1 / 1', position: 'relative', background: 'rgba(255,255,255,0.025)', border: '1px dashed rgba(255,255,255,0.1)' }}
-            >
-              <div style={{ position: 'absolute', inset: 0, background: i === 0 ? 'linear-gradient(135deg, rgba(184,242,36,0.05) 0%, transparent 60%)' : 'linear-gradient(225deg, rgba(184,242,36,0.04) 0%, transparent 60%)' }} />
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%', background: 'linear-gradient(to top, rgba(8,8,8,0.75), transparent)' }} />
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(184,242,36,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.6rem' }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(184,242,36,0.4)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>
-                  </div>
-                  <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.55rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.15)' }}>Image</p>
-                </div>
-              </div>
-              <div style={{ position: 'absolute', bottom: '0.9rem', left: '1rem' }}>
-                <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>{img.label}</p>
-              </div>
-            </motion.div>
-          ))}
+<div ref={pairRef} className="grid grid-cols-2 gap-4 mb-12">
+          {/* Workspace image */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.97 }}
+            animate={pairInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+            transition={{ duration: 0.55, delay: 0, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-2xl overflow-hidden"
+            style={{ aspectRatio: '1 / 1', position: 'relative' }}
+          >
+            <Image
+              src="/theworkspace.png"
+              alt="The workspace"
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes="(max-width: 768px) 50vw, 600px"
+            />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%', background: 'linear-gradient(to top, rgba(8,8,8,0.75), transparent)' }} />
+            <div style={{ position: 'absolute', bottom: '0.9rem', left: '1rem' }}>
+              <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>The workspace.</p>
+            </div>
+          </motion.div>
+
+          {/* Team image */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.97 }}
+            animate={pairInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+            transition={{ duration: 0.55, delay: 0.12, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-2xl overflow-hidden"
+            style={{ aspectRatio: '1 / 1', position: 'relative' }}
+          >
+            <Image
+              src="/Culture.png"
+              alt="The team"
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes="(max-width: 768px) 50vw, 600px"
+            />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '35%', background: 'linear-gradient(to top, rgba(8,8,8,0.75), transparent)' }} />
+            <div style={{ position: 'absolute', bottom: '0.9rem', left: '1rem' }}>
+              <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)' }}>The team.</p>
+            </div>
+          </motion.div>
         </div>
 
         {/* Values grid */}
