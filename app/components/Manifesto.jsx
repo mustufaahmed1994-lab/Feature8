@@ -48,11 +48,11 @@ function AccordionItem({ item, isOpen, onToggle, index, inView }) {
     <div className="flex items-center gap-5">
     <span style={{ fontFamily: 'var(--font-jost)', fontWeight: 700, fontSize: '0.65rem', letterSpacing: '0.12em', color: isOpen ? '#b8f224' : 'rgba(255,255,255,0.25)', minWidth: 24, transition: 'color 0.2s' }}>
       {item.num}
-    </span>span>
+    </span>
     <span style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)', color: isOpen ? 'white' : 'rgba(255,255,255,0.7)', transition: 'color 0.2s', letterSpacing: '-0.01em' }}>
       {item.title}
-    </span>span>
-    </div>div>
+    </span>
+    </div>
     <motion.div
       animate={{ rotate: isOpen ? 0 : 0 }}
       className="flex-shrink-0 ml-4 w-8 h-8 rounded-full flex items-center justify-center"
@@ -65,8 +65,8 @@ function AccordionItem({ item, isOpen, onToggle, index, inView }) {
       }}
       >
       {isOpen ? <Minus size={13} /> : <Plus size={13} />}
-    </motion.div>motion.div>
-    </button>button>
+    </motion.div>
+    </button>
     <AnimatePresence initial={false}>
       {isOpen && (
         <motion.div
@@ -80,12 +80,12 @@ function AccordionItem({ item, isOpen, onToggle, index, inView }) {
         <div style={{ paddingLeft: 'calc(24px + 1.25rem)', paddingBottom: '1.5rem', paddingRight: '3rem' }}>
         <p style={{ fontFamily: 'var(--font-inter)', fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.8 }}>
           {item.body}
-        </p>p>
-        </div>div>
-        </motion.div>motion.div>
+        </p>
+        </div>
+        </motion.div>
         )}
-    </AnimatePresence>AnimatePresence>
-    </motion.div>motion.div>
+    </AnimatePresence>
+    </motion.div>
     );
 }
 
@@ -108,11 +108,11 @@ export default function Manifesto() {
       transition={{ duration: 0.5 }}
       className="mb-12"
       >
-    <p className="label mb-3">Our Manifesto</p>p>
+    <p className="label mb-3">Our Manifesto</p>
     <h2 style={{ fontFamily: 'var(--font-barlow)', fontWeight: 700, fontSize: 'clamp(2.5rem, 5vw, 4rem)', lineHeight: 1.05, color: 'white', maxWidth: 600 }}>
     What Feature8 Actually Is.
-    </h2>h2>
-    </motion.div>motion.div>
+    </h2>
+    </motion.div>
     
       {/* Two-column layout: accordion left, sticky portrait image right */}
     <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
@@ -129,7 +129,7 @@ export default function Manifesto() {
         onToggle={() => setOpenIndex(openIndex === i ? -1 : i)}
         />
       ))}
-    </div>div>
+    </div>
     
       {/* Portrait image — sticky while scrolling accordion on desktop */}
     <motion.div
@@ -151,12 +151,12 @@ export default function Manifesto() {
       style={{ objectFit: 'cover' }}
       sizes="(max-width: 1024px) 100vw, 320px"
       />
-    </div>div>
-    <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)', marginTop: '0.8rem', paddingLeft: '0.2rem' }}>The people behind the product.</p>p>
-    </motion.div>motion.div>
+    </div>
+    <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)', marginTop: '0.8rem', paddingLeft: '0.2rem' }}>The people behind the product.</p>
+    </motion.div>
     
-    </div>div>
-    </div>div>
-    </section>section>
+    </div>
+    </div>
+    </section>
     );
 }</motion.div>
