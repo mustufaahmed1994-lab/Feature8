@@ -159,4 +159,4 @@ export default function Manifesto() {
     </div>
     </section>
     );
-}</motion.div>
+}
