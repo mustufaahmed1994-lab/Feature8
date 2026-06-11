@@ -152,7 +152,6 @@ export default function Manifesto() {
       sizes="(max-width: 1024px) 100vw, 320px"
       />
     </div>
-    <p style={{ fontFamily: 'var(--font-jost)', fontSize: '0.6rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.18)', marginTop: '0.8rem', paddingLeft: '0.2rem' }}>The people behind the product.</p>
     </motion.div>
     
     </div>
