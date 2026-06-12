@@ -34,7 +34,7 @@ export const metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://feature8.com/og-image.png',
+        url: 'https://feature8.com/office.jpg',
         width: 1200,
         height: 630,
         alt: 'Feature8 — Work Worth Waking Up For',
@@ -45,7 +45,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Feature8 — Work Worth Waking Up For',
     description: 'Feature8 is a Karachi-based tech, info, and media company building work worth waking up for.',
-    images: ['https://feature8.com/og-image.png'],
+    images: ['https://feature8.com/office.jpg'],
   },
 };
 
